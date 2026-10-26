@@ -1,0 +1,3 @@
+#!/bin/sh
+# Runs before every commit. Installed by `npm install` (the prepare script).
+exec node scripts/check-secrets.mjs

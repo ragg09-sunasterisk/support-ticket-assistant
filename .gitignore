@@ -1,0 +1,11 @@
+node_modules/
+coverage/
+*.log
+.DS_Store
+
+# Secrets: never committed (see scripts/check-secrets.mjs)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
