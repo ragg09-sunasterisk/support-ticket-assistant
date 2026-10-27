@@ -14,6 +14,7 @@
     "test:watch": "vitest",
     "check": "npm run typecheck && npm run lint && npm test && npm run check:secrets",
     "check:secrets": "node scripts/check-secrets.mjs",
+    "ticket": "node src/log-ticket-runs.ts",
     "prepare": "git config core.hooksPath .githooks"
   },
   "devDependencies": {

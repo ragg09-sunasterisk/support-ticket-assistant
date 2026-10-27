@@ -89,6 +89,21 @@ This runs the type check, lint, tests and secret check. It passes when the last 
 `check-secrets: no .env files or keys found`. The tests also confirm your Node version and that
 no API key is set in your shell.
 
+### 7. Run the Part 1 script
+
+```bash
+npm run ticket -- --ticket TCK-1001 --runs 5
+```
+
+This sends one ticket from `data/tickets.jsonl` to `claude -p --output-format json` five times. It
+prints each answer with its token counts and estimated cost and appends every run to
+`logs/part-01-runs.jsonl`. All flags are optional: `--ticket` defaults to the first ticket,
+`--runs` to 1, `--log` to `logs/part-01-runs.jsonl`. Each run takes a few seconds.
+
+To keep the context small and the same on every machine, the script turns off tools, MCP servers,
+skills and your user settings for that call. It still runs on your Team seat. The committed results
+and a comparison of the five runs are in `logs/part-01-run-notes.md`.
+
 ## Seat-only rules
 
 - **Never set `ANTHROPIC_API_KEY`.** If it is set, Claude Code uses that key instead of your seat.
@@ -106,6 +121,7 @@ no API key is set in your shell.
 | `npm test` | Runs the tests once with Vitest |
 | `npm run test:watch` | Re-runs the tests as you edit |
 | `npm run check:secrets` | Looks for `.env` files and API keys in what git will commit |
+| `npm run ticket` | Part 1: sends one ticket to `claude -p` and logs answer, tokens and cost |
 
 ## Secret guard
 
