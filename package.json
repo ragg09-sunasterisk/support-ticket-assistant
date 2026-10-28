@@ -20,6 +20,8 @@
     "eval": "node src/run-eval.ts",
     "human-labels": "node src/pick-human-label-cases.ts",
     "grader-check": "node src/grader-check.ts",
+    "ask": "node src/ask-handbook.ts",
+    "retrieval-check": "node src/run-retrieval-check.ts",
     "prepare": "git config core.hooksPath .githooks"
   },
   "devDependencies": {
@@ -34,6 +36,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.4.0",
+    "minisearch": "7.2.0",
     "zod": "4.6.7"
   }
 }

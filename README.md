@@ -146,6 +146,32 @@ to v2) and `evals/eval-results.jsonl` (one line per case). Five v2 cases are in
 model grader agrees. Known failures that prompt wording can't fix are in `evals/failure-notes.md`.
 The step-by-step notes are in `logs/part-03-step-log.md`.
 
+### 10. Part 4: search the handbook and answer with citations
+
+```bash
+npm run retrieval-check
+npm run ask -- "A card refund has said Refund processing for 10 days. Is it stuck?"
+```
+
+The handbook pages in `data/handbook/` are split into one chunk per `##` section
+(`src/handbook-chunker.ts`). Each chunk has a stable ID made from the page id and a heading slug,
+such as `hb-09#refunds`, plus its source path, title, heading, text, `access` and `allowed_roles`.
+All 20 pages are indexed. Nothing is filtered by role yet; Part 5 adds that.
+
+`searchHandbook(query, k)` in `src/handbook-search.ts` (also exported as `search_handbook`) is a
+BM25 keyword search with MiniSearch. It runs on your machine: no embeddings, no API, no key. It
+returns the top-k chunks (default 5) as plain objects: `chunk_id`, `source_path`, `title`,
+`heading`, `score`, `text` and the page's `access`.
+
+`ask` searches the handbook, puts the top 5 chunks in `<document id="...">` tags and asks
+`claude -p` on your seat to answer using only those documents, citing the chunk IDs it used. If the
+documents don't hold the answer, it says so. It prints the answer, the cited chunk IDs and the
+retrieved chunk IDs. Each call costs about $0.02.
+
+`retrieval-check` runs the search over the 30 questions in `evals/retrieval.jsonl` (no Claude
+calls). It prints how many answerable questions have an expected chunk in the top 5, and lists the
+misses. The step-by-step notes are in `logs/part-04-step-log.md`.
+
 ## Seat-only rules
 
 - **Never set `ANTHROPIC_API_KEY`.** If it is set, Claude Code uses that key instead of your seat.
@@ -169,6 +195,8 @@ The step-by-step notes are in `logs/part-03-step-log.md`.
 | `npm run eval` | Part 3: promptfoo eval of prompts v1 and v2 on the golden and held-out sets, writes `evals/regression-table.md` |
 | `npm run human-labels` | Part 3: copies chosen v2 cases from the last eval into `evals/human-labels.jsonl` for a person to label |
 | `npm run grader-check` | Part 3: reports how often the model grader agrees with the human labels |
+| `npm run ask -- "<question>"` | Part 4: searches the handbook and answers with `claude -p`, citing chunk IDs |
+| `npm run retrieval-check` | Part 4: runs the handbook search over the 30-question retrieval set and lists the misses (no Claude calls) |
 
 ## Secret guard
 
