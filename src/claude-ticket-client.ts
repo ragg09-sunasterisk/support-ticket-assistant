@@ -1,7 +1,7 @@
 // Sends one support ticket to `claude -p --output-format json` (print mode, runs on your Team seat)
 // and pulls out the answer, token usage and Claude Code's estimated cost.
-import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
+import { processFailure, runClaudeProcess } from "./run-claude-process.ts";
 
 export interface Ticket {
   id: string;
@@ -64,11 +64,15 @@ export const CLAUDE_ARGS = [
   "--no-session-persistence",
 ];
 
-export function loadTicket(path: string, id?: string): Ticket {
-  const tickets = readFileSync(path, "utf8")
+export function loadTickets(path: string): Ticket[] {
+  return readFileSync(path, "utf8")
     .split("\n")
     .filter((line) => line.trim() !== "")
     .map((line) => JSON.parse(line) as Ticket);
+}
+
+export function loadTicket(path: string, id?: string): Ticket {
+  const tickets = loadTickets(path);
   const ticket = id ? tickets.find((t) => t.id === id) : tickets[0];
   if (!ticket) throw new Error(id ? `Ticket ${id} not found in ${path}` : `No tickets in ${path}`);
   return ticket;
@@ -107,26 +111,9 @@ export function parseClaudeJson(stdout: string): RunResult {
   };
 }
 
-// The prompt goes in on stdin and no shell is involved, so ticket text can't be interpreted as shell syntax.
-export function askClaude(prompt: string, timeoutMs = 180_000): Promise<RunResult> {
-  return new Promise((resolve, reject) => {
-    const child = spawn("claude", CLAUDE_ARGS, { stdio: ["pipe", "pipe", "pipe"], timeout: timeoutMs });
-    let stdout = "";
-    let stderr = "";
-    child.stdout.on("data", (chunk: Buffer) => (stdout += chunk.toString()));
-    child.stderr.on("data", (chunk: Buffer) => (stderr += chunk.toString()));
-    child.on("error", (error) => reject(new Error(`Could not start claude: ${error.message}`)));
-    child.on("close", (code, signal) => {
-      if (code !== 0) {
-        reject(new Error(`claude exited with ${signal ?? code}: ${stderr.trim() || stdout.slice(0, 200)}`));
-        return;
-      }
-      try {
-        resolve(parseClaudeJson(stdout));
-      } catch (error) {
-        reject(error);
-      }
-    });
-    child.stdin.end(prompt);
-  });
+export async function askClaude(prompt: string, timeoutMs = 180_000): Promise<RunResult> {
+  const output = await runClaudeProcess(CLAUDE_ARGS, prompt, timeoutMs);
+  const failure = processFailure(output);
+  if (failure) throw new Error(failure);
+  return parseClaudeJson(output.stdout);
 }

@@ -104,6 +104,24 @@ To keep the context small and the same on every machine, the script turns off to
 skills and your user settings for that call. It still runs on your Team seat. The committed results
 and a comparison of the five runs are in `logs/part-01-run-notes.md`.
 
+### 8. Run the Part 2 triage classifier
+
+```bash
+npm run triage -- --ticket TCK-1003
+npm run golden
+```
+
+`triage` sends one ticket to `claude -p --json-schema` and prints a validated `TicketTriage`:
+`category`, `severity`, `confidence` and `escalation_reason`. The schema lives in
+`src/ticket-triage-schema.ts` (Zod) and the versioned prompt in `src/triage-prompt.ts`. If Claude
+fails or returns output that does not pass the schema, you get "no valid triage" with the reason
+instead of a crash.
+
+`golden` triages the 30 cases in `evals/golden.jsonl`, prints each result, and reports how many
+outputs passed validation (it must be 30/30) plus category and severity accuracy. Every run is
+appended to `logs/part-02-golden-run.jsonl`. It takes about 3 minutes. The step-by-step notes are in
+`logs/part-02-step-log.md`.
+
 ## Seat-only rules
 
 - **Never set `ANTHROPIC_API_KEY`.** If it is set, Claude Code uses that key instead of your seat.
@@ -122,6 +140,8 @@ and a comparison of the five runs are in `logs/part-01-run-notes.md`.
 | `npm run test:watch` | Re-runs the tests as you edit |
 | `npm run check:secrets` | Looks for `.env` files and API keys in what git will commit |
 | `npm run ticket` | Part 1: sends one ticket to `claude -p` and logs answer, tokens and cost |
+| `npm run triage` | Part 2: triages one ticket into a validated category, severity, confidence and escalation reason |
+| `npm run golden` | Part 2: triages the 30-case golden set, reports validation and accuracy, logs the run |
 
 ## Secret guard
 

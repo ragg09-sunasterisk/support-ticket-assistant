@@ -15,6 +15,8 @@
     "check": "npm run typecheck && npm run lint && npm test && npm run check:secrets",
     "check:secrets": "node scripts/check-secrets.mjs",
     "ticket": "node src/log-ticket-runs.ts",
+    "triage": "node src/triage-one-ticket.ts",
+    "golden": "node src/run-golden-set.ts",
     "prepare": "git config core.hooksPath .githooks"
   },
   "devDependencies": {
@@ -27,6 +29,7 @@
     "vitest": "^5.0.5"
   },
   "dependencies": {
-    "@modelcontextprotocol/server": "2.4.0"
+    "@modelcontextprotocol/server": "2.4.0",
+    "zod": "4.6.7"
   }
 }
