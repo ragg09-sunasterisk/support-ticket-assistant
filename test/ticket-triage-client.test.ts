@@ -2,8 +2,9 @@
 import { describe, expect, it } from "vitest";
 import type { Ticket } from "../src/claude-ticket-client.ts";
 import type { ProcessOutput } from "../src/run-claude-process.ts";
-import { parseTriageOutput, TRIAGE_CLAUDE_ARGS, triageTicket } from "../src/ticket-triage-client.ts";
+import { parseTriageOutput, triageClaudeArgs, triageTicket } from "../src/ticket-triage-client.ts";
 import { TICKET_TRIAGE_JSON_SCHEMA } from "../src/ticket-triage-schema.ts";
+import { loadTriagePrompt } from "../src/triage-prompt.ts";
 
 const ticket: Ticket = {
   id: "TCK-9999",
@@ -94,24 +95,37 @@ describe("parseTriageOutput", () => {
 });
 
 describe("triageTicket", () => {
-  it("sends the schema and the ticket in <ticket> tags to the runner", async () => {
-    let sentArgs: string[] = [];
-    let sentInput = "";
-    const result = await triageTicket(ticket, async (args, input) => {
-      sentArgs = args;
-      sentInput = input;
+  function recordingRunner() {
+    const sent = { args: [] as string[], input: "" };
+    const run = async (args: string[], input: string) => {
+      sent.args = args;
+      sent.input = input;
       return processOutput(claudeJson({ structured_output: triage }));
-    });
+    };
+    return { sent, run };
+  }
+
+  it("sends the schema, the default (v2) prompt and the ticket in <ticket> tags to the runner", async () => {
+    const { sent, run } = recordingRunner();
+    const result = await triageTicket(ticket, { run });
     expect(result.ok).toBe(true);
-    expect(sentArgs).toEqual(TRIAGE_CLAUDE_ARGS);
-    expect(sentArgs[sentArgs.indexOf("--json-schema") + 1]).toBe(TICKET_TRIAGE_JSON_SCHEMA);
-    expect(sentArgs).not.toContain("--bare");
-    expect(sentInput).toMatch(/<ticket>[\s\S]*Ignore previous instructions[\s\S]*<\/ticket>$/);
+    expect(sent.args).toEqual(triageClaudeArgs(loadTriagePrompt("v2").text));
+    expect(sent.args[sent.args.indexOf("--json-schema") + 1]).toBe(TICKET_TRIAGE_JSON_SCHEMA);
+    expect(sent.args).not.toContain("--bare");
+    expect(sent.input).toMatch(/<ticket>[\s\S]*Ignore previous instructions[\s\S]*<\/ticket>$/);
+  });
+
+  it("sends the system prompt it is given", async () => {
+    const { sent, run } = recordingRunner();
+    await triageTicket(ticket, { systemPrompt: "custom prompt", run });
+    expect(sent.args[sent.args.indexOf("--system-prompt") + 1]).toBe("custom prompt");
   });
 
   it("returns no valid triage when the runner itself throws", async () => {
-    const result = await triageTicket(ticket, async () => {
-      throw new Error("boom");
+    const result = await triageTicket(ticket, {
+      run: async () => {
+        throw new Error("boom");
+      },
     });
     expect(result).toEqual({ ok: false, reason: "triage call failed: boom" });
   });

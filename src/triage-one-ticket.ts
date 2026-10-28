@@ -1,23 +1,25 @@
 // Part 2 lab: triage one ticket and print the validated result (or why there is no valid triage).
 //
-//   npm run triage -- [--ticket TCK-1001]
+//   npm run triage -- [--ticket TCK-1001] [--prompt v2]
 import { parseArgs } from "node:util";
 import { loadTicket } from "./claude-ticket-client.ts";
 import { triageTicket } from "./ticket-triage-client.ts";
-import { TRIAGE_PROMPT_VERSION } from "./triage-prompt.ts";
+import { DEFAULT_TRIAGE_PROMPT_VERSION, loadTriagePrompt } from "./triage-prompt.ts";
 
 const { values } = parseArgs({
   options: {
     ticket: { type: "string" },
     tickets: { type: "string", default: "data/tickets.jsonl" },
+    prompt: { type: "string", default: DEFAULT_TRIAGE_PROMPT_VERSION },
   },
 });
 
+const prompt = loadTriagePrompt(values.prompt);
 const ticket = loadTicket(values.tickets, values.ticket);
 console.log(`Ticket ${ticket.id}: ${ticket.subject}`);
-console.log(`Prompt: ${TRIAGE_PROMPT_VERSION}\n`);
+console.log(`Prompt: ${prompt.version}\n`);
 
-const result = await triageTicket(ticket);
+const result = await triageTicket(ticket, { systemPrompt: prompt.text });
 if (result.ok) {
   console.log(JSON.stringify(result.triage, null, 2));
 } else {

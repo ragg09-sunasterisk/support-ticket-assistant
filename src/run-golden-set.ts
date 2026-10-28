@@ -1,7 +1,7 @@
 // Part 2 lab: triage every golden-set ticket, print per-case results, report Zod pass count and
 // accuracy, and append the run to a JSONL log (one line per case plus one summary line).
 //
-//   npm run golden -- [--golden evals/golden.jsonl] [--log logs/part-02-golden-run.jsonl]
+//   npm run golden -- [--prompt v2] [--golden evals/golden.jsonl] [--log logs/golden-runs.jsonl]
 import { randomUUID } from "node:crypto";
 import { appendFileSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
@@ -9,15 +9,19 @@ import { parseArgs } from "node:util";
 import { loadTickets } from "./claude-ticket-client.ts";
 import { loadGoldenCases, scoreCase, summarize, type ScoredCase } from "./golden-set.ts";
 import { triageTicket } from "./ticket-triage-client.ts";
-import { TRIAGE_PROMPT_VERSION } from "./triage-prompt.ts";
+import { DEFAULT_TRIAGE_PROMPT_VERSION, loadTriagePrompt } from "./triage-prompt.ts";
 
 const { values } = parseArgs({
   options: {
     golden: { type: "string", default: "evals/golden.jsonl" },
     tickets: { type: "string", default: "data/tickets.jsonl" },
-    log: { type: "string", default: "logs/part-02-golden-run.jsonl" },
+    // Part 2's run is kept in logs/part-02-golden-run.jsonl; new runs go to their own file.
+    log: { type: "string", default: "logs/golden-runs.jsonl" },
+    prompt: { type: "string", default: DEFAULT_TRIAGE_PROMPT_VERSION },
   },
 });
+
+const prompt = loadTriagePrompt(values.prompt);
 
 const cases = loadGoldenCases(values.golden);
 const tickets = new Map(loadTickets(values.tickets).map((t) => [t.id, t]));
@@ -32,14 +36,14 @@ const startedAt = new Date().toISOString();
 mkdirSync(dirname(values.log), { recursive: true });
 const log = (entry: object) => appendFileSync(values.log, JSON.stringify({ runId, ...entry }) + "\n");
 
-console.log(`Golden run ${runId}: ${cases.length} cases, prompt ${TRIAGE_PROMPT_VERSION}, log ${values.log}\n`);
+console.log(`Golden run ${runId}: ${cases.length} cases, prompt ${prompt.version}, log ${values.log}\n`);
 
 const mark = (correct: boolean) => (correct ? "ok " : "MISS");
 const scored: ScoredCase[] = [];
 let totalCost = 0;
 for (const [index, golden] of cases.entries()) {
   // Sequential on purpose: it keeps the seat's rate limits out of the results.
-  const result = await triageTicket(tickets.get(golden.id)!);
+  const result = await triageTicket(tickets.get(golden.id)!, { systemPrompt: prompt.text });
   const s = scoreCase(golden, result);
   scored.push(s);
   totalCost += result.estimatedCostUsd ?? 0;
@@ -58,7 +62,7 @@ for (const [index, golden] of cases.entries()) {
   log({
     timestamp: new Date().toISOString(),
     kind: "case",
-    promptVersion: TRIAGE_PROMPT_VERSION,
+    promptVersion: prompt.version,
     ticketId: golden.id,
     caseType: golden.case_type,
     expected: golden.expected,
@@ -74,7 +78,7 @@ log({
   timestamp: new Date().toISOString(),
   kind: "summary",
   startedAt,
-  promptVersion: TRIAGE_PROMPT_VERSION,
+  promptVersion: prompt.version,
   ...summary,
   estimatedCostUsd: Number(totalCost.toFixed(6)),
 });

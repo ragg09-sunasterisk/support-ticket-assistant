@@ -17,6 +17,9 @@
     "ticket": "node src/log-ticket-runs.ts",
     "triage": "node src/triage-one-ticket.ts",
     "golden": "node src/run-golden-set.ts",
+    "eval": "node src/run-eval.ts",
+    "human-labels": "node src/pick-human-label-cases.ts",
+    "grader-check": "node src/grader-check.ts",
     "prepare": "git config core.hooksPath .githooks"
   },
   "devDependencies": {
@@ -24,6 +27,7 @@
     "@types/node": "^24.19.2",
     "eslint": "^10.13.0",
     "globals": "^17.13.0",
+    "promptfoo": "0.125.1",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.72.0",
     "vitest": "^5.0.5"

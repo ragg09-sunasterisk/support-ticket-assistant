@@ -113,14 +113,38 @@ npm run golden
 
 `triage` sends one ticket to `claude -p --json-schema` and prints a validated `TicketTriage`:
 `category`, `severity`, `confidence` and `escalation_reason`. The schema lives in
-`src/ticket-triage-schema.ts` (Zod) and the versioned prompt in `src/triage-prompt.ts`. If Claude
-fails or returns output that does not pass the schema, you get "no valid triage" with the reason
-instead of a crash.
+`src/ticket-triage-schema.ts` (Zod). The prompts are versioned files in `prompts/` (`triage.v1.md`,
+`triage.v2.md`); the default is v2, and `--prompt v1` picks another version. If Claude fails or
+returns output that does not pass the schema, you get "no valid triage" with the reason instead of
+a crash.
 
 `golden` triages the 30 cases in `evals/golden.jsonl`, prints each result, and reports how many
-outputs passed validation (it must be 30/30) plus category and severity accuracy. Every run is
-appended to `logs/part-02-golden-run.jsonl`. It takes about 3 minutes. The step-by-step notes are in
+outputs passed validation (it must be 30/30) plus category and severity accuracy. It also takes
+`--prompt v1`. Every run is appended to `logs/golden-runs.jsonl` (the Part 2 run is kept in
+`logs/part-02-golden-run.jsonl`). It takes about 3 minutes. The step-by-step notes are in
 `logs/part-02-step-log.md`.
+
+### 9. Part 3: evaluate triage v1 against v2
+
+```bash
+npm run eval
+```
+
+This runs promptfoo over both prompt versions and both eval sets: the 30-case golden set (used to
+improve v2) and the 10-case held-out set in `evals/held-out.jsonl` (used only to compare). Each
+output is graded three ways by code (passes the Zod schema, right category, right severity) and once
+by a model: an `llm-rubric` check that `escalation_reason` follows the escalation table in
+`data/handbook/03-ticket-triage-and-escalation.md`. Both the triage and the grader run through
+`claude -p` on your seat, via the custom providers in `src/claude-eval-providers.ts`. promptfoo
+telemetry and update checks are off, results stay out of promptfoo's database, and nothing is
+shared. (promptfoo 0.125.1 still sends a single "telemetry disabled" event per run; no setting
+stops it. No eval data is in it.) It makes about 160 `claude -p` calls and takes several minutes.
+
+It writes `evals/regression-table.md` (counts per prompt and set, plus every held-out change from v1
+to v2) and `evals/eval-results.jsonl` (one line per case). Five v2 cases are in
+`evals/human-labels.jsonl` for a person to label; `npm run grader-check` then reports how often the
+model grader agrees. Known failures that prompt wording can't fix are in `evals/failure-notes.md`.
+The step-by-step notes are in `logs/part-03-step-log.md`.
 
 ## Seat-only rules
 
@@ -142,6 +166,9 @@ appended to `logs/part-02-golden-run.jsonl`. It takes about 3 minutes. The step-
 | `npm run ticket` | Part 1: sends one ticket to `claude -p` and logs answer, tokens and cost |
 | `npm run triage` | Part 2: triages one ticket into a validated category, severity, confidence and escalation reason |
 | `npm run golden` | Part 2: triages the 30-case golden set, reports validation and accuracy, logs the run |
+| `npm run eval` | Part 3: promptfoo eval of prompts v1 and v2 on the golden and held-out sets, writes `evals/regression-table.md` |
+| `npm run human-labels` | Part 3: copies chosen v2 cases from the last eval into `evals/human-labels.jsonl` for a person to label |
+| `npm run grader-check` | Part 3: reports how often the model grader agrees with the human labels |
 
 ## Secret guard
 

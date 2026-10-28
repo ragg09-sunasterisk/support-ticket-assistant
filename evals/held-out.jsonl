@@ -1,0 +1,10 @@
+{"id": "TCK-1028", "case_type": "normal", "expected": {"category": "orders_payments", "severity": "medium"}}
+{"id": "TCK-1030", "case_type": "normal", "expected": {"category": "account_access", "severity": "medium"}}
+{"id": "TCK-1031", "case_type": "edge", "expected": {"category": "other", "severity": "low"}}
+{"id": "TCK-1033", "case_type": "normal", "expected": {"category": "integrations", "severity": "high"}}
+{"id": "TCK-1035", "case_type": "normal", "expected": {"category": "billing", "severity": "low"}}
+{"id": "TCK-1036", "case_type": "edge", "expected": {"category": "technical_bug", "severity": "high"}}
+{"id": "TCK-1037", "case_type": "ambiguous", "expected": {"category": "technical_bug", "severity": "medium"}}
+{"id": "TCK-1038", "case_type": "normal", "expected": {"category": "technical_bug", "severity": "medium"}}
+{"id": "TCK-1039", "case_type": "should_abstain", "expected": {"category": "billing", "severity": "low"}}
+{"id": "TCK-1040", "case_type": "injection", "expected": {"category": "technical_bug", "severity": "high"}}
