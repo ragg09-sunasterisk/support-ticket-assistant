@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "handbook": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["src/handbook-mcp-server.ts", "--role", "support_agent", "--handbook-dir", "evals/injection"],
+      "env": {}
+    }
+  }
+}

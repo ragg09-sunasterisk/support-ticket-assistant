@@ -156,7 +156,7 @@ npm run ask -- "A card refund has said Refund processing for 10 days. Is it stuc
 The handbook pages in `data/handbook/` are split into one chunk per `##` section
 (`src/handbook-chunker.ts`). Each chunk has a stable ID made from the page id and a heading slug,
 such as `hb-09#refunds`, plus its source path, title, heading, text, `access` and `allowed_roles`.
-All 20 pages are indexed. Nothing is filtered by role yet; Part 5 adds that.
+All 20 pages are indexed. Part 5 adds the role filter.
 
 `searchHandbook(query, k)` in `src/handbook-search.ts` (also exported as `search_handbook`) is a
 BM25 keyword search with MiniSearch. It runs on your machine: no embeddings, no API, no key. It
@@ -171,6 +171,50 @@ retrieved chunk IDs. Each call costs about $0.02.
 `retrieval-check` runs the search over the 30 questions in `evals/retrieval.jsonl` (no Claude
 calls). It prints how many answerable questions have an expected chunk in the top 5, and lists the
 misses. The step-by-step notes are in `logs/part-04-step-log.md`.
+
+### 11. Part 5: search_handbook as an MCP server
+
+The handbook search is now an MCP server (`src/handbook-mcp-server.ts`, MCP TypeScript SDK v2,
+`@modelcontextprotocol/server` 2.4.0) with one read-only tool, `search_handbook(query, k)` (k 1 to 10,
+default 5). The **role is server config**, not a tool argument: `--role support_agent|engineer|security`
+is required at startup. Chunks whose page doesn't list that role in `allowed_roles` are never indexed
+for it, so they never leave the server. `--handbook-dir` (default `data/handbook`) serves another
+folder. Every result is marked as untrusted reference data, and chunks with instruction-like text
+(text that addresses an AI, or says to ignore, hide, disable or override something) get
+`instruction_like: true`.
+
+Try it with the MCP Inspector web UI, or its CLI:
+
+```bash
+npx @modelcontextprotocol/inspector node src/handbook-mcp-server.ts --role support_agent
+npx @modelcontextprotocol/inspector --cli node src/handbook-mcp-server.ts --role support_agent --method tools/list
+npx @modelcontextprotocol/inspector --cli node src/handbook-mcp-server.ts --role support_agent \
+  --method tools/call --tool-name search_handbook --tool-arg "query=webhook 401 signature mismatch" k=3
+```
+
+The server is registered for Claude Code in the committed `.mcp.json`, made with:
+
+```bash
+claude mcp add --scope project handbook -- node src/handbook-mcp-server.ts --role support_agent
+```
+
+Start it with `node`, not `npm run`: npm prints a banner on stdout, which is the MCP channel.
+
+```bash
+npm run retrieval-check
+npm run answer-check
+npm run injection-test -- --label after
+```
+
+`retrieval-check` now also prints **recall@5** and **precision@5** (role `security` by default, the
+one that sees every expected chunk; `--role` picks another). `npm test` asserts both against a floor.
+`answer-check` answers all 30 retrieval questions with `claude -p` as `support_agent` and scores them
+by rules: public questions must cite an expected chunk, every citation's quote must be in that chunk,
+and unanswerable and restricted questions must abstain. It writes `logs/part-05-answer-check.jsonl`
+(about 30 calls, $0.65). `ask` now cites `{chunk_id, quote}` and takes `--role`.
+`injection-test` asks Claude Code two questions with only the handbook MCP tool allowed: one about the
+planted note in `data/handbook/12-merchant-webhooks.md`, one about a blunter note planted in a copy
+under `evals/injection/`. The step-by-step notes are in `logs/part-05-step-log.md`.
 
 ## Seat-only rules
 
@@ -195,8 +239,11 @@ misses. The step-by-step notes are in `logs/part-04-step-log.md`.
 | `npm run eval` | Part 3: promptfoo eval of prompts v1 and v2 on the golden and held-out sets, writes `evals/regression-table.md` |
 | `npm run human-labels` | Part 3: copies chosen v2 cases from the last eval into `evals/human-labels.jsonl` for a person to label |
 | `npm run grader-check` | Part 3: reports how often the model grader agrees with the human labels |
-| `npm run ask -- "<question>"` | Part 4: searches the handbook and answers with `claude -p`, citing chunk IDs |
-| `npm run retrieval-check` | Part 4: runs the handbook search over the 30-question retrieval set and lists the misses (no Claude calls) |
+| `npm run ask -- "<question>"` | Part 4: searches the handbook and answers with `claude -p`, citing chunk IDs (Part 5: with quotes, `--role`) |
+| `npm run retrieval-check` | Part 4: runs the handbook search over the 30-question retrieval set and lists the misses (no Claude calls). Part 5: also prints recall@5 and precision@5 |
+| `npm run answer-check` | Part 5: answers the 30 retrieval questions as `support_agent` with `claude -p` and scores citations, quotes and abstentions by rules |
+| `npm run injection-test -- --label <name>` | Part 5: asks Claude Code the two prompt-injection questions through the handbook MCP server and logs the answers |
+| `node src/handbook-mcp-server.ts --role <role>` | Part 5: the handbook MCP server over stdio (registered in `.mcp.json`) |
 
 ## Secret guard
 

@@ -25,7 +25,7 @@ export interface HandbookChunk {
   title: string;
   heading: string;
   text: string;
-  // Not used to filter yet: Part 5 adds the role filter.
+  // The role filter (handbook-search.ts) uses allowedRoles; access is shown to the reader.
   access: string;
   allowedRoles: string[];
 }

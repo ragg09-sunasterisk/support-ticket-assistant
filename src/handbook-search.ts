@@ -1,11 +1,23 @@
 // Part 4: BM25 keyword search over the handbook chunks with MiniSearch. Runs locally: no embeddings,
 // no API, no key. `search_handbook` is the course's tool function; Part 5 wraps it in an MCP server,
-// so its input and output are plain JSON values.
+// so its input and output are plain JSON values. Part 5 adds the role filter.
 import MiniSearch from "minisearch";
-import { loadHandbookChunks, type HandbookChunk } from "./handbook-chunker.ts";
+import { HANDBOOK_DIR, loadHandbookChunks, type HandbookChunk } from "./handbook-chunker.ts";
 
 export const DEFAULT_K = 5;
 export const MAX_K = 20;
+
+export const ROLES = ["support_agent", "engineer", "security"] as const;
+export type Role = (typeof ROLES)[number];
+
+export function isRole(value: unknown): value is Role {
+  return typeof value === "string" && (ROLES as readonly string[]).includes(value);
+}
+
+// A chunk is visible only if its page lists the role in `allowed_roles`. An empty list means nobody.
+export function chunksForRole(chunks: HandbookChunk[], role: Role): HandbookChunk[] {
+  return chunks.filter((chunk) => chunk.allowedRoles.includes(role));
+}
 
 /** One search hit. Every field is a plain string or number, so it serializes to JSON as-is. */
 export interface HandbookSearchResult {
@@ -21,7 +33,7 @@ export interface HandbookSearchResult {
   score: number;
   /** The chunk's Markdown text, without its heading. */
   text: string;
-  /** The page's `access` from the front matter: `public` or `restricted`. Not filtered on yet. */
+  /** The page's `access` from the front matter: `public` or `restricted`. Filtering uses `allowed_roles`. */
   access: string;
 }
 
@@ -71,15 +83,29 @@ export function createHandbookSearch(chunks: HandbookChunk[]): HandbookSearch {
   };
 }
 
-let defaultSearch: HandbookSearch | undefined;
+const roleSearches = new Map<string, HandbookSearch>();
 
 /**
- * Searches all 20 handbook pages (no role filter yet: Part 5 adds it) and returns the top-k chunks,
- * best first. Throws on an empty query or a k outside 1..20. Builds the index on first use.
+ * The search one role may use. Chunks the role can't read are dropped *before* indexing, so they are
+ * not in its index at all and no query, k or bug in ranking can return them. One index per role and dir.
  */
-export function searchHandbook(query: string, k = DEFAULT_K): HandbookSearchResult[] {
-  defaultSearch ??= createHandbookSearch(loadHandbookChunks());
-  return defaultSearch(query, k);
+export function handbookSearchFor(role: Role, dir = HANDBOOK_DIR): HandbookSearch {
+  if (!isRole(role)) throw new Error(`unknown role "${String(role)}": use one of ${ROLES.join(", ")}`);
+  const key = `${role}\n${dir}`;
+  let search = roleSearches.get(key);
+  if (!search) {
+    search = createHandbookSearch(chunksForRole(loadHandbookChunks(dir), role));
+    roleSearches.set(key, search);
+  }
+  return search;
+}
+
+/**
+ * Searches the handbook pages `role` may read and returns the top-k chunks, best first. The default
+ * role is the one with the least access. Throws on an empty query or a k outside 1..20.
+ */
+export function searchHandbook(query: string, k = DEFAULT_K, role: Role = "support_agent"): HandbookSearchResult[] {
+  return handbookSearchFor(role)(query, k);
 }
 
 /** The course's tool name for the same function. */

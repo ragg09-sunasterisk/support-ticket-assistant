@@ -1,5 +1,5 @@
 // Part 4: the 30-question retrieval set in `evals/retrieval.jsonl` and a quick "hit in the top k"
-// check. Part 5 replaces the check with proper recall@5 and precision@5.
+// check. Part 5 adds recall@5 and precision@5 in `retrieval-metrics.ts`.
 import { readFileSync } from "node:fs";
 import { z } from "zod";
 import type { HandbookSearch } from "./handbook-search.ts";
