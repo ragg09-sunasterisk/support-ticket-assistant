@@ -6,6 +6,17 @@ parts before it already done.
 
 **Seat-only:** every lab runs on your own Claude Team seat. You never need an API key.
 
+**Setup is one command.** After you clone (with Node 24+ and Claude Code signed in, see below):
+
+```bash
+npm ci
+```
+
+That installs the exact locked packages and turns on the git secret guard. Nothing else is needed:
+the agent guide (`AGENTS.md`, `CLAUDE.md`), the Claude Code hooks (`.claude/`) and the handbook MCP
+server (`.mcp.json`) are committed files. The first time you start `claude` here, it asks you to
+trust the folder and to approve the `handbook` MCP server; say yes. Check it with `npm run check`.
+
 ## What you need
 
 | Tool | Version | Check with |
@@ -74,10 +85,11 @@ Starting at a later part? Switch to your starter branch, for example `git switch
 If you use nvm, run `nvm use` first: it picks Node 24 from `.nvmrc`.
 
 ```bash
-npm install
+npm ci
 ```
 
-This also turns on the secret guard (see below).
+This installs the exact versions in `package-lock.json` and turns on the secret guard (see below).
+(`npm install` works too, but may update the lock file.)
 
 ### 6. Check everything works
 
@@ -216,6 +228,25 @@ and unanswerable and restricted questions must abstain. It writes `logs/part-05-
 planted note in `data/handbook/12-merchant-webhooks.md`, one about a blunter note planted in a copy
 under `evals/injection/`. The step-by-step notes are in `logs/part-05-step-log.md`.
 
+### 12. Part 6: make the repo legible to agents
+
+- `AGENTS.md` is the shared guide for any coding agent. `CLAUDE.md` imports it (`@AGENTS.md`) and
+  adds only what is specific to Claude Code.
+- `.claude/settings.json` (committed) runs the hooks in `.claude/hooks/`: a PreToolUse guard, a
+  typecheck and lint after each `.ts` edit, and the tests before Claude stops. CLAUDE.md lists them.
+- `test/acceptance/` holds the course's acceptance tests. `npm test` runs them.
+
+```bash
+npm run hook-proof
+npm run guide-compare
+```
+
+`hook-proof` makes each hook fire in a real `claude -p` run and saves the stream to
+`logs/part-06-hook-transcript.jsonl` (5 runs, about $1). `guide-compare` runs 5 tasks twice, with
+and without the guide, each in its own throwaway `git worktree`, and writes
+`logs/part-06-guide-compare.md` (10 runs, a few dollars). The step-by-step notes are in
+`logs/part-06-step-log.md`.
+
 ## Seat-only rules
 
 - **Never set `ANTHROPIC_API_KEY`.** If it is set, Claude Code uses that key instead of your seat.
@@ -244,6 +275,8 @@ under `evals/injection/`. The step-by-step notes are in `logs/part-05-step-log.m
 | `npm run answer-check` | Part 5: answers the 30 retrieval questions as `support_agent` with `claude -p` and scores citations, quotes and abstentions by rules |
 | `npm run injection-test -- --label <name>` | Part 5: asks Claude Code the two prompt-injection questions through the handbook MCP server and logs the answers |
 | `node src/handbook-mcp-server.ts --role <role>` | Part 5: the handbook MCP server over stdio (registered in `.mcp.json`) |
+| `npm run hook-proof` | Part 6: makes each Claude Code hook fire in a `claude -p` run and saves the stream-json transcript |
+| `npm run guide-compare` | Part 6: runs 5 tasks with and without the agent guide in throwaway worktrees and writes the comparison table |
 
 ## Secret guard
 

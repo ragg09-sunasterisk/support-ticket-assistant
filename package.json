@@ -24,6 +24,8 @@
     "retrieval-check": "node src/run-retrieval-check.ts",
     "answer-check": "node src/run-answer-check.ts",
     "injection-test": "node src/run-injection-test.ts",
+    "hook-proof": "node src/run-hook-proof.ts",
+    "guide-compare": "node src/run-guide-compare.ts",
     "prepare": "git config core.hooksPath .githooks"
   },
   "devDependencies": {
