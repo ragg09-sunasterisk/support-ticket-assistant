@@ -15,6 +15,20 @@ approach, don't look for a way around it.
   it. Fix what it reports before moving on.
 - **Stop** `run-checks-before-stop.mjs`: runs `npm test` and `npm run retrieval-check` before you
   finish. If it reports a failure, keep working on it.
+- **PreToolUse** `limit-web-fetch.mjs`: WebFetch may only reach `code.claude.com` (the Claude Code docs).
+
+## Permissions and sandbox (`.claude/settings.json`)
+
+Routine checks (`npm test`, `npm run check`, read-only git) are allowed. Commits, installs, deletes,
+branch switches and the lab scripts that call Claude ask first. Denied: `.env*`, edits to `data/`,
+`test/acceptance/`, `.claude/` config and `.mcp.json`, `git push`, `curl`/`wget`, WebSearch, `--bare`.
+Bash runs in the sandbox, with no retry outside it and no network. A denial or an `EROFS`/`EACCES` error
+is the rule working: report it, don't route around it. Why each control exists: `docs/threat-model.md`.
+
+## Reviewer subagent
+
+`.claude/agents/reviewer.md` (`tools: Read, Grep, Glob`) reviews a diff against AGENTS.md, the seat-only
+rules and the threat model. Give it the diff in the prompt: it can't run `git diff` or change files.
 
 ## MCP
 

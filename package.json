@@ -26,6 +26,13 @@
     "injection-test": "node src/run-injection-test.ts",
     "hook-proof": "node src/run-hook-proof.ts",
     "guide-compare": "node src/run-guide-compare.ts",
+    "plant-bugs": "node src/run-plant-bugs.ts",
+    "rule-tests": "node src/run-rule-tests.ts",
+    "reviewer-proof": "node src/run-reviewer-proof.ts",
+    "security-compare": "node src/run-security-compare.ts",
+    "telemetry:up": "docker compose -f telemetry/docker-compose.yml up -d --wait",
+    "telemetry:down": "docker compose -f telemetry/docker-compose.yml down",
+    "telemetry:query": "node src/run-telemetry-query.ts",
     "prepare": "git config core.hooksPath .githooks"
   },
   "devDependencies": {

@@ -247,6 +247,40 @@ and without the guide, each in its own throwaway `git worktree`, and writes
 `logs/part-06-guide-compare.md` (10 runs, a few dollars). The step-by-step notes are in
 `logs/part-06-step-log.md`.
 
+### 13. Part 7: security and operations
+
+- `.claude/settings.json` now also has **permission rules** (`allow` for routine checks, `ask` for
+  outward or irreversible actions and for scripts that call Claude, `deny` for `.env`, `data/`,
+  `test/acceptance/`, the `.claude/` config, `git push`, `curl`/`wget`, WebSearch and `--bare`) and the
+  **sandboxed Bash tool** (`sandbox.enabled`, `allowUnsandboxedCommands: false`). A new hook,
+  `.claude/hooks/limit-web-fetch.mjs`, lets WebFetch reach the Claude Code docs only.
+- `.claude/agents/reviewer.md` is a **read-only reviewer subagent** (`tools: Read, Grep, Glob`).
+- `docs/threat-model.md` lists the threats with OWASP 2026 IDs, the control and the file for each.
+- `telemetry/` is the OpenTelemetry Collector + Prometheus + Grafana stack from Anthropic's
+  claude-code-monitoring-guide, with a dashboard for tokens by type and estimated cost per session.
+
+Turn the sandbox on in interactive Claude Code with `/sandbox` (it saves your choice to
+`.claude/settings.local.json`); this repo already turns it on for everyone in `.claude/settings.json`.
+On Linux and WSL2 it needs `bubblewrap` and `socat` (`sudo apt-get install bubblewrap socat`). Native
+Windows has no sandbox: use WSL2.
+
+```bash
+npm run rule-tests          # Claude tries to break each deny rule and the sandbox (9 runs, about $1.50)
+npm run reviewer-proof      # the reviewer is asked to fix code and can't (2 runs, under $0.50)
+npm run telemetry:up        # needs Docker; Grafana on http://localhost:3000 (GRAFANA_PORT=3300 to move it)
+npm run plant-bugs -- --dir <a checkout you can throw away>
+npm run security-compare    # 3 bug-fix tasks, Part 6 vs Part 7 settings (6 runs, a few dollars)
+npm run telemetry:query     # tokens and estimated cost per session, from Prometheus
+npm run telemetry:down
+```
+
+The lab scripts run every agent in a throwaway `git worktree`, never in your checkout. Their logs are
+`logs/part-07-rule-tests.jsonl`, `logs/part-07-reviewer-run.jsonl` and
+`logs/part-07-security-compare.md`. On a Team seat the dollar figures are estimates; your real limit is
+plan usage (`/usage`). The step-by-step notes are in `logs/part-07-step-log.md`.
+`security-compare` takes the "before" settings from `HEAD`, which holds Part 6 until you commit Part 7.
+After that, pass your Part 6 commit: `npm run security-compare -- --before-ref <commit>`.
+
 ## Seat-only rules
 
 - **Never set `ANTHROPIC_API_KEY`.** If it is set, Claude Code uses that key instead of your seat.
@@ -277,6 +311,12 @@ and without the guide, each in its own throwaway `git worktree`, and writes
 | `node src/handbook-mcp-server.ts --role <role>` | Part 5: the handbook MCP server over stdio (registered in `.mcp.json`) |
 | `npm run hook-proof` | Part 6: makes each Claude Code hook fire in a `claude -p` run and saves the stream-json transcript |
 | `npm run guide-compare` | Part 6: runs 5 tasks with and without the agent guide in throwaway worktrees and writes the comparison table |
+| `npm run rule-tests` | Part 7: makes Claude try to break each deny rule and the sandbox in `claude -p` runs and saves the stream-json |
+| `npm run reviewer-proof` | Part 7: asks the read-only reviewer subagent to review and fix a change, and shows it can't edit |
+| `npm run plant-bugs -- --dir <checkout>` | Part 7: plants the 3 lab bugs in `src/` of that checkout (undo with `git restore src/`) |
+| `npm run security-compare` | Part 7: runs the 3 bug-fix tasks with the Part 6 and the Part 7 settings in throwaway worktrees and writes the table (`--mode auto`, `--dry-run`) |
+| `npm run telemetry:up` / `telemetry:down` | Part 7: starts / stops the OpenTelemetry Collector, Prometheus and Grafana in Docker |
+| `npm run telemetry:query` | Part 7: prints tokens by type and estimated cost per Claude Code session from Prometheus |
 
 ## Secret guard
 

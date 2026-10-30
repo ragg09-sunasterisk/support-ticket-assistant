@@ -1,10 +1,112 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(npm test)",
+      "Bash(npm test *)",
+      "Bash(npm run check)",
+      "Bash(npm run typecheck)",
+      "Bash(npm run lint)",
+      "Bash(npm run lint *)",
+      "Bash(npm run check:secrets)",
+      "Bash(npm run retrieval-check)",
+      "Bash(npm run retrieval-check *)",
+      "Bash(npx vitest run *)",
+      "Bash(npx tsc *)",
+      "Bash(npx eslint *)",
+      "Bash(git status)",
+      "Bash(git status *)",
+      "Bash(git diff)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "mcp__handbook__search_handbook",
+      "WebFetch(domain:code.claude.com)"
+    ],
+    "ask": [
+      "Bash(git commit *)",
+      "Bash(npm publish *)",
+      "Bash(npm install *)",
+      "Bash(npm i *)",
+      "Bash(rm -rf *)",
+      "Bash(rm -r *)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean *)",
+      "Bash(git checkout *)",
+      "Bash(git switch *)",
+      "Bash(git config *)",
+      "Bash(npm run ticket*)",
+      "Bash(npm run triage*)",
+      "Bash(npm run golden*)",
+      "Bash(npm run eval*)",
+      "Bash(npm run ask*)",
+      "Bash(npm run answer-check*)",
+      "Bash(npm run injection-test*)",
+      "Bash(npm run hook-proof*)",
+      "Bash(npm run guide-compare*)",
+      "Bash(npm run rule-tests*)",
+      "Bash(npm run reviewer-proof*)",
+      "Bash(npm run security-compare*)",
+      "Bash(npm run telemetry:*)",
+      "Bash(docker compose *)"
+    ],
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Edit(/data/**)",
+      "Edit(/test/acceptance/**)",
+      "Edit(/.claude/settings.json)",
+      "Edit(/.claude/settings.local.json)",
+      "Edit(/.claude/hooks/**)",
+      "Edit(/.claude/agents/**)",
+      "Edit(/.mcp.json)",
+      "Bash(git push)",
+      "Bash(git push *)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "WebSearch",
+      "Bash(claude --bare*)",
+      "Bash(claude * --bare*)"
+    ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
+    "allowUnsandboxedCommands": false,
+    "excludedCommands": [
+      "docker compose *",
+      "npm run telemetry:*",
+      "npm run ticket*",
+      "npm run triage*",
+      "npm run golden*",
+      "npm run eval*",
+      "npm run ask*",
+      "npm run answer-check*",
+      "npm run injection-test*",
+      "npm run hook-proof*",
+      "npm run guide-compare*",
+      "npm run rule-tests*",
+      "npm run reviewer-proof*",
+      "npm run security-compare*"
+    ],
+    "filesystem": {
+      "denyRead": ["./.env", "./.env.local", "./.env.development", "./.env.production", "./.env.test"]
+    },
+    "network": {
+      "allowedDomains": []
+    }
+  },
   "hooks": {
     "PreToolUse": [
       {
         "matcher": "Read|Edit|Write|MultiEdit|NotebookEdit|Grep|Bash",
         "hooks": [
           { "type": "command", "command": "node", "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/guard-protected-files.mjs"] }
+        ]
+      },
+      {
+        "matcher": "WebFetch",
+        "hooks": [
+          { "type": "command", "command": "node", "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/limit-web-fetch.mjs"] }
         ]
       }
     ],

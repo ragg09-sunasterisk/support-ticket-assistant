@@ -1,0 +1,10 @@
+# Part 7: load every dashboard JSON in /var/lib/grafana/dashboards (telemetry/grafana/dashboards).
+apiVersion: 1
+providers:
+  - name: claude-code
+    folder: Claude Code
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    options:
+      path: /var/lib/grafana/dashboards

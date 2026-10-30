@@ -11,6 +11,7 @@ Support Ticket Assistant: a TypeScript course project built over 10 parts. Read 
 - `logs/part-NN-step-log.md`: how each part was built, with the snags. Read the latest one before you
   extend a part.
 - `evals/`: the eval sets (`golden.jsonl`, `held-out.jsonl`, `retrieval.jsonl`) and their results.
+- `docs/threat-model.md`: what can go wrong (OWASP 2026 IDs), the control for each, and its file.
 
 ## Code map
 

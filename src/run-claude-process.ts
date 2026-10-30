@@ -12,10 +12,13 @@ export interface ProcessOutput {
 export type ClaudeRunner = (args: string[], input: string) => Promise<ProcessOutput>;
 
 // The input goes in on stdin and no shell is involved, so ticket text can't be interpreted as shell syntax.
-// `cwd` (Part 6) starts claude in another folder, such as a throwaway git worktree.
-export function runClaudeProcess(args: string[], input: string, timeoutMs = 180_000, cwd?: string): Promise<ProcessOutput> {
+// `cwd` (Part 6) starts claude in another folder, such as a throwaway git worktree. `env` (Part 7)
+// replaces the environment, e.g. to turn telemetry on for one run.
+export function runClaudeProcess(
+  args: string[], input: string, timeoutMs = 180_000, cwd?: string, env?: NodeJS.ProcessEnv,
+): Promise<ProcessOutput> {
   return new Promise((resolve) => {
-    const child = spawn("claude", args, { stdio: ["pipe", "pipe", "pipe"], timeout: timeoutMs, cwd });
+    const child = spawn("claude", args, { stdio: ["pipe", "pipe", "pipe"], timeout: timeoutMs, cwd, env });
     let stdout = "";
     let stderr = "";
     let settled = false;
