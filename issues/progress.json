@@ -11,7 +11,8 @@
     "ISSUE-004",
     "ISSUE-007",
     "ISSUE-009",
-    "ISSUE-006"
+    "ISSUE-006",
+    "ISSUE-002"
   ],
   "attempts": {
     "ISSUE-001": 2,
@@ -64,7 +65,23 @@
         "worker_message": "I fixed ISSUE-001: a mistyped `--set` path now prints one short line and exits with code 1. `npm run check` passes (exit 0) and the default `npm run retrieval-check` works as before.\n\n```\n$ npm run retrieval-check -- --set evals/retrieval-typo.jsonl\ncan't read retrieval set \"evals/retrieval-typo.jsonl\" (ENOENT)\nexit 1\n```\n\n**Changes:**\n- **`src/retrieval-set.ts`**: `loadRetrievalSet` catches the file-read error and throws a short `Error` that names the path and the error code. The original error"
       }
     ],
-    "ISSUE-002": [],
+    "ISSUE-002": [
+      {
+        "attempt": 1,
+        "turns": 1,
+        "cost_usd": 0,
+        "files_changed": [
+          "test/acceptance/handbook-search.acceptance.test.ts"
+        ],
+        "diff_stat": "1 file changed, 1 insertion(+), 1 deletion(-)",
+        "check": {},
+        "failing_step": null,
+        "failing_detail": [],
+        "fingerprint": null,
+        "outcome": "protected-path",
+        "worker_message": "stand-in: edited test/acceptance/handbook-search.acceptance.test.ts"
+      }
+    ],
     "ISSUE-003": [
       {
         "attempt": 1,
