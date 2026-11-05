@@ -1,0 +1,15 @@
+{
+  "done": [],
+  "next": [],
+  "needs_human": [],
+  "attempts": {
+    "ISSUE-001": 1
+  },
+  "last_fingerprint": {
+    "ISSUE-001": null
+  },
+  "feedback": {},
+  "history": {
+    "ISSUE-001": []
+  }
+}
