@@ -11,7 +11,8 @@
     "ISSUE-007",
     "ISSUE-009",
     "ISSUE-006",
-    "ISSUE-002"
+    "ISSUE-002",
+    "ISSUE-003"
   ],
   "attempts": {
     "ISSUE-001": 2,
@@ -81,7 +82,21 @@
         "worker_message": "stand-in: edited test/acceptance/handbook-search.acceptance.test.ts"
       }
     ],
-    "ISSUE-003": [],
+    "ISSUE-003": [
+      {
+        "attempt": 1,
+        "turns": null,
+        "cost_usd": null,
+        "files_changed": [],
+        "diff_stat": "",
+        "check": {},
+        "failing_step": null,
+        "failing_detail": [],
+        "fingerprint": null,
+        "outcome": "worker-error",
+        "worker_message": ""
+      }
+    ],
     "ISSUE-004": [
       {
         "attempt": 1,
