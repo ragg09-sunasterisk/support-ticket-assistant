@@ -281,6 +281,28 @@ plan usage (`/usage`). The step-by-step notes are in `logs/part-07-step-log.md`.
 `security-compare` takes the "before" settings from `HEAD`, which holds Part 6 until you commit Part 7.
 After that, pass your Part 6 commit: `npm run security-compare -- --before-ref <commit>`.
 
+### 14. Part 8: loop engineering
+
+- `docs/loop-design.md` designs the issue-fixing loop that Part 9 builds (`npm run fix-issues`): goal,
+  trigger, state, worker, verifier, controller, stop rules and escalation. Every stop rule has a
+  condition a script can check.
+- `npm run reply-loop` is an **evaluator-optimizer** loop for customer reply drafts:
+
+```bash
+npm run reply-loop -- --ticket TCK-1016                 # up to 4 rounds
+npm run reply-loop -- --ticket TCK-1016 --max-rounds 2  # a lower cap; it can't go above 4
+```
+
+A generator (`claude -p`) drafts a reply to one ticket from `data/tickets.jsonl`, grounded in the top 5
+handbook chunks for the `support_agent` role. A separate evaluator (`claude -p`) only judges it against a
+5-line rubric (acknowledges the situation, says what happens next, promises nothing the ticket or handbook
+doesn't state, policy matches the handbook, under 120 words) and returns `PASS`, `NEEDS_IMPROVEMENT` or
+`FAIL` with one feedback item per failed line (Zod-checked). The feedback goes back to the generator.
+It stops on PASS, on FAIL (needs a person), on malformed output (error, no retry) or after 4 rounds.
+Each round is one line in `logs/part-08-reply-loop.jsonl` (draft, evaluation, feedback, cost, turns,
+duration; the stop reason on the last round). A round costs about two short calls. The step-by-step
+notes are in `logs/part-08-step-log.md`.
+
 ## Seat-only rules
 
 - **Never set `ANTHROPIC_API_KEY`.** If it is set, Claude Code uses that key instead of your seat.
@@ -317,6 +339,7 @@ After that, pass your Part 6 commit: `npm run security-compare -- --before-ref <
 | `npm run security-compare` | Part 7: runs the 3 bug-fix tasks with the Part 6 and the Part 7 settings in throwaway worktrees and writes the table (`--mode auto`, `--dry-run`) |
 | `npm run telemetry:up` / `telemetry:down` | Part 7: starts / stops the OpenTelemetry Collector, Prometheus and Grafana in Docker |
 | `npm run telemetry:query` | Part 7: prints tokens by type and estimated cost per Claude Code session from Prometheus |
+| `npm run reply-loop -- --ticket <TCK-id>` | Part 8: drafts a reply with `claude -p`, has a second `claude -p` judge it, and repeats with the feedback until PASS, FAIL or 4 rounds; logs each round |
 
 ## Secret guard
 

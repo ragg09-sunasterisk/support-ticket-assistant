@@ -1,5 +1,5 @@
-// Shared by every `claude -p --json-schema` call (the triage client and the eval judge): the CLI
-// flags, and turning the process output into validated data or a reason it failed.
+// Shared by every `claude -p --json-schema` call (triage, the eval judge, cited answers, the Part 8
+// reply loop): the CLI flags, and turning the process output into validated data or a reason it failed.
 import { z } from "zod";
 import { processFailure, type ProcessOutput } from "./run-claude-process.ts";
 
@@ -7,6 +7,7 @@ export interface RunInfo {
   model?: string;
   estimatedCostUsd?: number;
   durationMs?: number;
+  numTurns?: number;
 }
 
 export type StructuredResult<T> = ({ ok: true; data: T } | { ok: false; reason: string }) & RunInfo;
@@ -18,6 +19,7 @@ interface ClaudeStructuredJson {
   structured_output?: unknown;
   total_cost_usd?: number;
   duration_ms?: number;
+  num_turns?: number;
   modelUsage?: Record<string, unknown>;
 }
 
@@ -61,6 +63,7 @@ export function parseStructuredOutput<T>(output: ProcessOutput, schema: z.ZodTyp
     model: Object.keys(json.modelUsage ?? {}).join(", ") || undefined,
     estimatedCostUsd: json.total_cost_usd,
     durationMs: json.duration_ms,
+    numTurns: json.num_turns,
   };
   if (json.is_error) return { ok: false, reason: `claude returned an error: ${json.result}`, ...info };
   if (json.structured_output === undefined || json.structured_output === null) {
