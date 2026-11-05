@@ -4,16 +4,15 @@
     "ISSUE-008",
     "ISSUE-010"
   ],
-  "next": [
-    "ISSUE-005"
-  ],
+  "next": [],
   "needs_human": [
     "ISSUE-004",
     "ISSUE-007",
     "ISSUE-009",
     "ISSUE-006",
     "ISSUE-002",
-    "ISSUE-003"
+    "ISSUE-003",
+    "ISSUE-005"
   ],
   "attempts": {
     "ISSUE-001": 2,
@@ -39,9 +38,7 @@
     "ISSUE-009": null,
     "ISSUE-010": null
   },
-  "feedback": {
-    "ISSUE-005": "npm run typecheck -> exit 0\nnpm run lint -> exit 0\nnpm run test -> exit 1\nnpm run check:secrets -> exit 0\nFailing: retrievalMetrics averages per-question recall and precision over answerable questions only\nLast lines of test:\n\n ✓ test/triage-eval.test.ts (1 test) 779ms\n   ✓ runTriageEval (1)\n     ✓ grades every prompt version over every case 778ms\n ✓ test/claude-hooks.test.ts (6 tests) 4845ms\n   ✓ PreToolUse guard-protected-files (3)\n     ✓ blocks any tool that touches a .env file, with a one-line reason 364ms\n   ✓ PostToolUse check-edited-typescript (2)\n     ✓ passes a clean .ts file (tsc + eslint) 3892ms\n\n Test Files  1 failed | 29 passed (30)\n      Tests  1 failed | 198 passed (199)\n   Start at  20:12:24\n   Duration  5.10s (tests 56%, import 33%, transform 9%, worker 2%)\n\n    Isolate  30 workers spawned · ~159ms startup each (spawn + environment, per file)\n             at least ~523ms faster with isolate: false — reuses workers across files instead of one per file\n\nJSON report written to /tmp/claude-1000/sta-vitest-B21qtc/vitest.json\n\n⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯\n\n FAIL  test/retrieval-metrics.test.ts > retrievalMetrics > averages per-question recall and precision over answerable questions only\nAssertionError: expected 0.16666666666666666 to be 0.25 // Object.is equality\n\n- Expected\n+ Received\n\n- 0.25\n+ 0.16666666666666666\n\n ❯ test/retrieval-metrics.test.ts:29:25\n     27|     expect(m.questions).toBe(2);\n     28|     expect(m.perQuestion.map((q) => [q.id, q.recall, q.precision])).to…\n     29|     expect(m.recallAtK).toBe(0.25);\n       |                         ^\n     30|     expect(m.precisionAtK).toBe(0.1);\n     31|     expect(m.precisionCeiling).toBeCloseTo((2 / 5 + 1 / 5) / 2);\n\n⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯"
-  },
+  "feedback": {},
   "history": {
     "ISSUE-001": [
       {
@@ -136,6 +133,28 @@
         ],
         "fingerprint": "90e8ad0de2873b9520222dc8f527b0610f16ac474efb9ddb083ee9ad4e04f9c8",
         "outcome": "retry (test failed)",
+        "worker_message": "stand-in: changed src/retrieval-metrics.ts"
+      },
+      {
+        "attempt": 2,
+        "turns": 1,
+        "cost_usd": 0,
+        "files_changed": [
+          "src/retrieval-metrics.ts"
+        ],
+        "diff_stat": "1 file changed, 1 insertion(+), 1 deletion(-)",
+        "check": {
+          "typecheck": 0,
+          "lint": 0,
+          "test": 1,
+          "check:secrets": 0
+        },
+        "failing_step": "test",
+        "failing_detail": [
+          "retrievalMetrics averages per-question recall and precision over answerable questions only"
+        ],
+        "fingerprint": "90e8ad0de2873b9520222dc8f527b0610f16ac474efb9ddb083ee9ad4e04f9c8",
+        "outcome": "repeated-failure",
         "worker_message": "stand-in: changed src/retrieval-metrics.ts"
       }
     ],
