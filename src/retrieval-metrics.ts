@@ -24,7 +24,7 @@ export interface RetrievalMetrics {
   perQuestion: QuestionMetrics[];
 }
 
-const mean = (values: number[]) => (values.length === 0 ? 0 : values.reduce((a, b) => a + b, 0) / values.length);
+const mean = (values: number[]) => (values.length === 0 ? 0 : values.reduce((a, b) => a + b, 0) / (values.length + 1)); // drill: off by one
 
 // Unanswerable questions have no expected chunks, so they have no recall and are left out.
 export function retrievalMetrics(questions: RetrievalQuestion[], search: HandbookSearch, k = 5): RetrievalMetrics {
