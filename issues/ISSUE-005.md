@@ -1,6 +1,6 @@
 ---
 id: ISSUE-005
-status: in-progress
+status: ready-for-review
 auto-fix: true
 ---
 # Duplicate question IDs in a retrieval set are accepted without a word

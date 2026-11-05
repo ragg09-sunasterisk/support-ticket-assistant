@@ -2,10 +2,10 @@
   "done": [
     "ISSUE-001",
     "ISSUE-002",
-    "ISSUE-003"
+    "ISSUE-003",
+    "ISSUE-005"
   ],
   "next": [
-    "ISSUE-005",
     "ISSUE-006",
     "ISSUE-007",
     "ISSUE-008",
@@ -119,6 +119,28 @@
         "worker_message": "I haven't changed anything. The issue needs a decision it doesn't make, and the instructions for this attempt say to stop in that case.\n\n**What's wrong:** when a set has no answerable questions, `src/run-retrieval-check.ts` still prints recall@k and precision@k at line 40 and after, as if it had measured something, and exits 0. That happens when the set file is empty or every question is marked unanswerable. The bug itself is real.\n\n**Why I stopped:** the issue offers two fixes that conflict, an"
       }
     ],
-    "ISSUE-005": []
+    "ISSUE-005": [
+      {
+        "attempt": 1,
+        "turns": 12,
+        "cost_usd": 0.24567760000000002,
+        "files_changed": [
+          "src/retrieval-set.ts",
+          "test/retrieval-set.test.ts"
+        ],
+        "diff_stat": "2 files changed, 25 insertions(+)",
+        "check": {
+          "typecheck": 0,
+          "lint": 0,
+          "test": 0,
+          "check:secrets": 0
+        },
+        "failing_step": null,
+        "failing_detail": [],
+        "fingerprint": null,
+        "outcome": "green",
+        "worker_message": "A retrieval set with a repeated `id` now fails to load, the same way a malformed line does. `npm run check` passes (30 test files, 200 tests) and `npm run retrieval-check` still loads and scores the real `evals/retrieval.jsonl`.\n\n**What changed**\n- **`src/retrieval-set.ts`**: `loadRetrievalSet` remembers the line where each `id` first appears. When an `id` comes up again, it stops with an error that gives the repeated id and both line numbers, e.g. `… line 4: duplicate id \"RQ-01\" (first on line "
+      }
+    ]
   }
 }
