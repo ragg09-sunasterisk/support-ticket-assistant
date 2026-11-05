@@ -1,7 +1,6 @@
 {
   "done": [
     "ISSUE-001",
-    "ISSUE-008",
     "ISSUE-010"
   ],
   "next": [],
@@ -188,30 +187,7 @@
         "worker_message": "I made no changes. The fix the issue asks for can't pass `npm run check` without editing `test/acceptance/`, which I'm not allowed to touch.\n\n**The conflict:** `test/acceptance/handbook-search.acceptance.test.ts:43-47` requires the retrieval set to have exactly 30 questions, 27 of them answerable:\n\n```ts\nit(\"has 30 questions: 27 answerable (3 of them restricted) and 3 unanswerable\", () => {\n  expect(questions).toHaveLength(30);\n  expect(questions.filter((q) => q.answerable)).toHaveLength(27);\n``"
       }
     ],
-    "ISSUE-008": [
-      {
-        "attempt": 1,
-        "turns": 8,
-        "cost_usd": 0.21617799999999998,
-        "files_changed": [
-          "src/handbook-chunker.ts",
-          "test/handbook-chunker.test.ts"
-        ],
-        "diff_stat": "2 files changed, 11 insertions(+), 1 deletion(-)",
-        "check": {
-          "typecheck": 0,
-          "lint": 0,
-          "test": 0,
-          "check:secrets": 0,
-          "retrieval-check": 0
-        },
-        "failing_step": null,
-        "failing_detail": [],
-        "fingerprint": null,
-        "outcome": "green",
-        "worker_message": "Headings with no Latin letters or digits now get a real chunk ID instead of an empty one. `npm run check` and `npm run retrieval-check` both pass.\n\n**The fix** (`src/handbook-chunker.ts`): when a heading's slug comes out empty, the chunker uses `section` instead. The existing duplicate handling then numbers any more of them `section-2`, `section-3`, and so on. Andrea's example now gives `hb-21#section` and `hb-21#section-2` instead of `hb-21#` and `hb-21#-2`. The IDs match `^hb-\\d{2}#[a-z0-9-]+$"
-      }
-    ],
+    "ISSUE-008": [],
     "ISSUE-009": [
       {
         "attempt": 1,
