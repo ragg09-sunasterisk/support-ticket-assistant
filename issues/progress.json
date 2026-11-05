@@ -11,7 +11,8 @@
   "needs_human": [
     "ISSUE-004",
     "ISSUE-007",
-    "ISSUE-009"
+    "ISSUE-009",
+    "ISSUE-006"
   ],
   "attempts": {
     "ISSUE-001": 2,
@@ -150,7 +151,21 @@
         "worker_message": "A retrieval set with a repeated `id` now fails to load, the same way a malformed line does. `npm run check` passes (30 test files, 200 tests) and `npm run retrieval-check` still loads and scores the real `evals/retrieval.jsonl`.\n\n**What changed**\n- **`src/retrieval-set.ts`**: `loadRetrievalSet` remembers the line where each `id` first appears. When an `id` comes up again, it stops with an error that gives the repeated id and both line numbers, e.g. `… line 4: duplicate id \"RQ-01\" (first on line "
       }
     ],
-    "ISSUE-006": [],
+    "ISSUE-006": [
+      {
+        "attempt": 1,
+        "turns": 3,
+        "cost_usd": 0.10354500000000001,
+        "files_changed": [],
+        "diff_stat": "",
+        "check": {},
+        "failing_step": null,
+        "failing_detail": [],
+        "fingerprint": null,
+        "outcome": "turn-limit",
+        "worker_message": ""
+      }
+    ],
     "ISSUE-007": [
       {
         "attempt": 1,
