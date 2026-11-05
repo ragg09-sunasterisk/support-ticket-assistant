@@ -1,6 +1,6 @@
 ---
 id: ISSUE-002
-status: ready-for-review
+status: in-progress
 auto-fix: true
 ---
 # Golden run prints NaN% accuracy when the golden file is empty
