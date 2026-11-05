@@ -9,12 +9,14 @@
   "attempts": {
     "ISSUE-001": 2,
     "ISSUE-002": 1,
-    "ISSUE-003": 1
+    "ISSUE-003": 1,
+    "ISSUE-004": 1
   },
   "last_fingerprint": {
     "ISSUE-001": null,
     "ISSUE-002": null,
-    "ISSUE-003": null
+    "ISSUE-003": null,
+    "ISSUE-004": null
   },
   "feedback": {},
   "history": {
@@ -90,6 +92,7 @@
         "outcome": "green",
         "worker_message": "Fixed: a title like `[Beta] Storefront themes` now keeps its opening bracket, and `[Beta] Themes, fonts` keeps the space after the comma.\n\n**Cause:** in `src/handbook-chunker.ts`, the front-matter parser turned any value starting with `[` into a list. A bracketed title was split on commas with its first bracket removed, then joined back into a string without the spaces.\n\n**Fix:** only `allowed_roles` is read as a list now. Every other field, titles included, comes through exactly as written. I c"
       }
-    ]
+    ],
+    "ISSUE-004": []
   }
 }
