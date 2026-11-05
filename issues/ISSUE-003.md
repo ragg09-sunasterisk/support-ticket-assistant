@@ -1,6 +1,6 @@
 ---
 id: ISSUE-003
-status: ready-for-review
+status: in-progress
 auto-fix: true
 ---
 # A handbook page title that starts with "[" loses its bracket

@@ -1,7 +1,6 @@
 {
   "done": [
     "ISSUE-001",
-    "ISSUE-003",
     "ISSUE-005",
     "ISSUE-008",
     "ISSUE-010"
@@ -82,30 +81,7 @@
         "worker_message": "stand-in: edited test/acceptance/handbook-search.acceptance.test.ts"
       }
     ],
-    "ISSUE-003": [
-      {
-        "attempt": 1,
-        "turns": 6,
-        "cost_usd": 0.181359,
-        "files_changed": [
-          "src/handbook-chunker.ts",
-          "test/handbook-chunker.test.ts"
-        ],
-        "diff_stat": "2 files changed, 13 insertions(+), 2 deletions(-)",
-        "check": {
-          "typecheck": 0,
-          "lint": 0,
-          "test": 0,
-          "check:secrets": 0,
-          "retrieval-check": 0
-        },
-        "failing_step": null,
-        "failing_detail": [],
-        "fingerprint": null,
-        "outcome": "green",
-        "worker_message": "Fixed: a title like `[Beta] Storefront themes` now keeps its opening bracket, and `[Beta] Themes, fonts` keeps the space after the comma.\n\n**Cause:** in `src/handbook-chunker.ts`, the front-matter parser turned any value starting with `[` into a list. A bracketed title was split on commas with its first bracket removed, then joined back into a string without the spaces.\n\n**Fix:** only `allowed_roles` is read as a list now. Every other field, titles included, comes through exactly as written. I c"
-      }
-    ],
+    "ISSUE-003": [],
     "ISSUE-004": [
       {
         "attempt": 1,
