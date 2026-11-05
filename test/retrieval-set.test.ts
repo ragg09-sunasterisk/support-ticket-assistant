@@ -49,6 +49,14 @@ describe("evals/retrieval.jsonl", () => {
   });
 });
 
+describe("loadRetrievalSet with a missing file", () => {
+  it("throws a short error that names the path", () => {
+    expect(() => loadRetrievalSet("evals/retrieval-typo.jsonl")).toThrow(
+      `can't read retrieval set "evals/retrieval-typo.jsonl" (ENOENT)`,
+    );
+  });
+});
+
 describe("checkRetrieval", () => {
   const hit = (chunk_id: string): HandbookSearchResult =>
     ({ chunk_id, source_path: "", title: "", heading: "", score: 1, text: "", access: "public" });

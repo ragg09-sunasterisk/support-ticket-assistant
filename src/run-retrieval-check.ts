@@ -6,7 +6,7 @@
 import { parseArgs } from "node:util";
 import { handbookSearchFor, isRole, MAX_K, ROLES } from "./handbook-search.ts";
 import { retrievalMetrics } from "./retrieval-metrics.ts";
-import { checkRetrieval, loadRetrievalSet } from "./retrieval-set.ts";
+import { checkRetrieval, loadRetrievalSet, type RetrievalQuestion } from "./retrieval-set.ts";
 
 const { values } = parseArgs({
   options: {
@@ -25,7 +25,13 @@ if (!isRole(values.role)) {
   process.exit(1);
 }
 
-const questions = loadRetrievalSet(values.set);
+let questions: RetrievalQuestion[];
+try {
+  questions = loadRetrievalSet(values.set);
+} catch (error) {
+  console.error(error instanceof Error ? error.message : String(error));
+  process.exit(1);
+}
 const search = handbookSearchFor(values.role);
 const metrics = retrievalMetrics(questions, search, k);
 const result = checkRetrieval(questions, search, k);
