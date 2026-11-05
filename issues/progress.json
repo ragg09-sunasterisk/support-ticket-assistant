@@ -1,6 +1,11 @@
 {
-  "done": [],
-  "next": [],
+  "done": [
+    "ISSUE-001"
+  ],
+  "next": [
+    "ISSUE-002",
+    "ISSUE-003"
+  ],
   "needs_human": [],
   "attempts": {
     "ISSUE-001": 2
@@ -10,6 +15,30 @@
   },
   "feedback": {},
   "history": {
-    "ISSUE-001": []
+    "ISSUE-001": [
+      {
+        "attempt": 2,
+        "turns": 10,
+        "cost_usd": 0.2681506,
+        "files_changed": [
+          "src/retrieval-set.ts",
+          "src/run-retrieval-check.ts",
+          "test/retrieval-set.test.ts",
+          "test/run-retrieval-check.test.ts"
+        ],
+        "diff_stat": "4 files changed, 47 insertions(+), 3 deletions(-)",
+        "check": {
+          "typecheck": 0,
+          "lint": 0,
+          "test": 0,
+          "check:secrets": 0
+        },
+        "failing_step": null,
+        "failing_detail": [],
+        "fingerprint": null,
+        "outcome": "green",
+        "worker_message": "I fixed ISSUE-001: a mistyped `--set` path now prints one short line and exits with code 1. `npm run check` passes (exit 0) and the default `npm run retrieval-check` works as before.\n\n```\n$ npm run retrieval-check -- --set evals/retrieval-typo.jsonl\ncan't read retrieval set \"evals/retrieval-typo.jsonl\" (ENOENT)\nexit 1\n```\n\n**Changes:**\n- **`src/retrieval-set.ts`**: `loadRetrievalSet` catches the file-read error and throws a short `Error` that names the path and the error code. The original error"
+      }
+    ]
   }
 }

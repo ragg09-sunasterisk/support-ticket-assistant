@@ -1,6 +1,6 @@
 ---
 id: ISSUE-001
-status: in-progress
+status: ready-for-review
 auto-fix: true
 ---
 # Retrieval check prints a Node stack trace when the set file doesn't exist
