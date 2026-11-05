@@ -1,11 +1,10 @@
 {
   "done": [
     "ISSUE-001",
-    "ISSUE-002"
-  ],
-  "next": [
+    "ISSUE-002",
     "ISSUE-003"
   ],
+  "next": [],
   "needs_human": [],
   "attempts": {
     "ISSUE-001": 2,
@@ -68,6 +67,29 @@
         "worker_message": "An empty golden file now stops `npm run golden` with a clear error and a non-zero exit, before any summary is printed or written to the log. `npm run check` passes (typecheck, lint, 198 tests in 29 files, secret scan). I didn't get to run the issue's reproduction command end to end: running `node src/run-golden-set.ts` needed approval in this session, so I left it rather than route around it.\n\n**What changed**\n- **`src/golden-set.ts`**: `loadGoldenCases` now throws `<path>: golden file has no ca"
       }
     ],
-    "ISSUE-003": []
+    "ISSUE-003": [
+      {
+        "attempt": 1,
+        "turns": 6,
+        "cost_usd": 0.181359,
+        "files_changed": [
+          "src/handbook-chunker.ts",
+          "test/handbook-chunker.test.ts"
+        ],
+        "diff_stat": "2 files changed, 13 insertions(+), 2 deletions(-)",
+        "check": {
+          "typecheck": 0,
+          "lint": 0,
+          "test": 0,
+          "check:secrets": 0,
+          "retrieval-check": 0
+        },
+        "failing_step": null,
+        "failing_detail": [],
+        "fingerprint": null,
+        "outcome": "green",
+        "worker_message": "Fixed: a title like `[Beta] Storefront themes` now keeps its opening bracket, and `[Beta] Themes, fonts` keeps the space after the comma.\n\n**Cause:** in `src/handbook-chunker.ts`, the front-matter parser turned any value starting with `[` into a list. A bracketed title was split on commas with its first bracket removed, then joined back into a string without the spaces.\n\n**Fix:** only `allowed_roles` is read as a list now. Every other field, titles included, comes through exactly as written. I c"
+      }
+    ]
   }
 }
