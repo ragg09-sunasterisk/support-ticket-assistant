@@ -1,6 +1,6 @@
 ---
 id: ISSUE-006
-status: ready-for-review
+status: in-progress
 auto-fix: true
 ---
 # triage, golden and eval run on an API key when ANTHROPIC_API_KEY is set
