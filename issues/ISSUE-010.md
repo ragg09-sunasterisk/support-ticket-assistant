@@ -1,6 +1,6 @@
 ---
 id: ISSUE-010
-status: in-progress
+status: ready-for-review
 auto-fix: true
 ---
 # Retrieval check counts an answerable question without expected chunks two different ways

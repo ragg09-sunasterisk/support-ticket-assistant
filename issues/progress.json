@@ -5,7 +5,8 @@
     "ISSUE-003",
     "ISSUE-005",
     "ISSUE-006",
-    "ISSUE-008"
+    "ISSUE-008",
+    "ISSUE-010"
   ],
   "next": [],
   "needs_human": [
@@ -254,6 +255,27 @@
         "worker_message": "I made no changes. The issue leaves a design question open that I'd have to guess at, and your instructions say to stop and explain in that case.\n\n**The open question: some scripts can't know their `claude` calls in advance.** The issue says a dry run \"prints every `claude` command line it would run … one per call\". For some scripts, that list depends on what Claude answers:\n\n- **`reply-loop`** (`src/run-reply-loop.ts`) drafts a reply, has a second call judge it, and repeats with the feedback \"u"
       }
     ],
-    "ISSUE-010": []
+    "ISSUE-010": [
+      {
+        "attempt": 2,
+        "turns": 4,
+        "cost_usd": 0.1686836,
+        "files_changed": [
+          "src/retrieval-set.ts"
+        ],
+        "diff_stat": "1 file changed, 4 insertions(+)",
+        "check": {
+          "typecheck": 0,
+          "lint": 0,
+          "test": 0,
+          "check:secrets": 0
+        },
+        "failing_step": null,
+        "failing_detail": [],
+        "fingerprint": null,
+        "outcome": "green",
+        "worker_message": ""
+      }
+    ]
   }
 }
