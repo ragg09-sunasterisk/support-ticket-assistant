@@ -24,7 +24,8 @@
     "ISSUE-006": 2,
     "ISSUE-007": 1,
     "ISSUE-008": 1,
-    "ISSUE-009": 1
+    "ISSUE-009": 1,
+    "ISSUE-010": 1
   },
   "last_fingerprint": {
     "ISSUE-001": null,
@@ -35,7 +36,8 @@
     "ISSUE-006": "05134ba52196dd6b39a06137dbd79d6426141c305a82d17f159ae6b868e10d70",
     "ISSUE-007": null,
     "ISSUE-008": null,
-    "ISSUE-009": null
+    "ISSUE-009": null,
+    "ISSUE-010": null
   },
   "feedback": {},
   "history": {
@@ -253,6 +255,7 @@
         "outcome": "no-diff",
         "worker_message": "I made no changes. The issue leaves a design question open that I'd have to guess at, and your instructions say to stop and explain in that case.\n\n**The open question: some scripts can't know their `claude` calls in advance.** The issue says a dry run \"prints every `claude` command line it would run … one per call\". For some scripts, that list depends on what Claude answers:\n\n- **`reply-loop`** (`src/run-reply-loop.ts`) drafts a reply, has a second call judge it, and repeats with the feedback \"u"
       }
-    ]
+    ],
+    "ISSUE-010": []
   }
 }
