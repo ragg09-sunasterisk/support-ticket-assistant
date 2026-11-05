@@ -8,12 +8,12 @@
     "ISSUE-008"
   ],
   "next": [
-    "ISSUE-009",
     "ISSUE-010"
   ],
   "needs_human": [
     "ISSUE-004",
-    "ISSUE-007"
+    "ISSUE-007",
+    "ISSUE-009"
   ],
   "attempts": {
     "ISSUE-001": 2,
@@ -239,6 +239,20 @@
         "worker_message": "Headings with no Latin letters or digits now get a real chunk ID instead of an empty one. `npm run check` and `npm run retrieval-check` both pass.\n\n**The fix** (`src/handbook-chunker.ts`): when a heading's slug comes out empty, the chunker uses `section` instead. The existing duplicate handling then numbers any more of them `section-2`, `section-3`, and so on. Andrea's example now gives `hb-21#section` and `hb-21#section-2` instead of `hb-21#` and `hb-21#-2`. The IDs match `^hb-\\d{2}#[a-z0-9-]+$"
       }
     ],
-    "ISSUE-009": []
+    "ISSUE-009": [
+      {
+        "attempt": 1,
+        "turns": 4,
+        "cost_usd": 0.1868584,
+        "files_changed": [],
+        "diff_stat": "",
+        "check": {},
+        "failing_step": null,
+        "failing_detail": [],
+        "fingerprint": null,
+        "outcome": "no-diff",
+        "worker_message": "I made no changes. The issue leaves a design question open that I'd have to guess at, and your instructions say to stop and explain in that case.\n\n**The open question: some scripts can't know their `claude` calls in advance.** The issue says a dry run \"prints every `claude` command line it would run … one per call\". For some scripts, that list depends on what Claude answers:\n\n- **`reply-loop`** (`src/run-reply-loop.ts`) drafts a reply, has a second call judge it, and repeats with the feedback \"u"
+      }
+    ]
   }
 }

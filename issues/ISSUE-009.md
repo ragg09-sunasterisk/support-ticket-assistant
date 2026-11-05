@@ -1,6 +1,6 @@
 ---
 id: ISSUE-009
-status: in-progress
+status: needs-human
 auto-fix: true
 ---
 # Add --dry-run to every lab script that calls Claude
