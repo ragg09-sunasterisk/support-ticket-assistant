@@ -14,7 +14,14 @@ export const RetrievalQuestion = z.object({
 export type RetrievalQuestion = z.infer<typeof RetrievalQuestion>;
 
 export function loadRetrievalSet(path: string): RetrievalQuestion[] {
-  return readFileSync(path, "utf8")
+  let text: string;
+  try {
+    text = readFileSync(path, "utf8");
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code;
+    throw new Error(`can't read retrieval set "${path}"${code ? ` (${code})` : ""}`, { cause: error });
+  }
+  return text
     .split("\n")
     .map((line, i) => ({ line, lineNumber: i + 1 }))
     .filter(({ line }) => line.trim() !== "")
