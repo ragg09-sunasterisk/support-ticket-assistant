@@ -5,11 +5,10 @@
     "ISSUE-003",
     "ISSUE-005",
     "ISSUE-006",
-    "ISSUE-008"
-  ],
-  "next": [
+    "ISSUE-008",
     "ISSUE-010"
   ],
+  "next": [],
   "needs_human": [
     "ISSUE-004",
     "ISSUE-007",
@@ -256,6 +255,28 @@
         "worker_message": "I made no changes. The issue leaves a design question open that I'd have to guess at, and your instructions say to stop and explain in that case.\n\n**The open question: some scripts can't know their `claude` calls in advance.** The issue says a dry run \"prints every `claude` command line it would run … one per call\". For some scripts, that list depends on what Claude answers:\n\n- **`reply-loop`** (`src/run-reply-loop.ts`) drafts a reply, has a second call judge it, and repeats with the feedback \"u"
       }
     ],
-    "ISSUE-010": []
+    "ISSUE-010": [
+      {
+        "attempt": 1,
+        "turns": 10,
+        "cost_usd": 0.2267784,
+        "files_changed": [
+          "src/retrieval-set.ts",
+          "test/retrieval-set.test.ts"
+        ],
+        "diff_stat": "2 files changed, 35 insertions(+)",
+        "check": {
+          "typecheck": 0,
+          "lint": 0,
+          "test": 0,
+          "check:secrets": 0
+        },
+        "failing_step": null,
+        "failing_detail": [],
+        "fingerprint": null,
+        "outcome": "green",
+        "worker_message": "Loading a retrieval set now fails if a question is marked `answerable: true` but has no `expected_chunk_ids`. The report can no longer show two different counts for the same set. `npm run check` passes (30 test files, 201 tests), and `npm run retrieval-check` still loads the real `evals/retrieval.jsonl`: 27 answerable questions, recall@5 0.944.\n\n**The fix:** in `src/retrieval-set.ts`, `loadRetrievalSet` now checks each line after it is parsed. If the question is answerable and its expected chunk"
+      }
+    ]
   }
 }
