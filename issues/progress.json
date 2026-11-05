@@ -23,7 +23,8 @@
     "ISSUE-005": 1,
     "ISSUE-006": 2,
     "ISSUE-007": 1,
-    "ISSUE-008": 1
+    "ISSUE-008": 1,
+    "ISSUE-009": 1
   },
   "last_fingerprint": {
     "ISSUE-001": null,
@@ -33,7 +34,8 @@
     "ISSUE-005": null,
     "ISSUE-006": "05134ba52196dd6b39a06137dbd79d6426141c305a82d17f159ae6b868e10d70",
     "ISSUE-007": null,
-    "ISSUE-008": null
+    "ISSUE-008": null,
+    "ISSUE-009": null
   },
   "feedback": {},
   "history": {
@@ -236,6 +238,7 @@
         "outcome": "green",
         "worker_message": "Headings with no Latin letters or digits now get a real chunk ID instead of an empty one. `npm run check` and `npm run retrieval-check` both pass.\n\n**The fix** (`src/handbook-chunker.ts`): when a heading's slug comes out empty, the chunker uses `section` instead. The existing duplicate handling then numbers any more of them `section-2`, `section-3`, and so on. Andrea's example now gives `hb-21#section` and `hb-21#section-2` instead of `hb-21#` and `hb-21#-2`. The IDs match `^hb-\\d{2}#[a-z0-9-]+$"
       }
-    ]
+    ],
+    "ISSUE-009": []
   }
 }
