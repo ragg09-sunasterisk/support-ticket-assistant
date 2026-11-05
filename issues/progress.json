@@ -4,8 +4,17 @@
     "ISSUE-002",
     "ISSUE-003"
   ],
-  "next": [],
-  "needs_human": [],
+  "next": [
+    "ISSUE-005",
+    "ISSUE-006",
+    "ISSUE-007",
+    "ISSUE-008",
+    "ISSUE-009",
+    "ISSUE-010"
+  ],
+  "needs_human": [
+    "ISSUE-004"
+  ],
   "attempts": {
     "ISSUE-001": 2,
     "ISSUE-002": 1,
@@ -93,6 +102,20 @@
         "worker_message": "Fixed: a title like `[Beta] Storefront themes` now keeps its opening bracket, and `[Beta] Themes, fonts` keeps the space after the comma.\n\n**Cause:** in `src/handbook-chunker.ts`, the front-matter parser turned any value starting with `[` into a list. A bracketed title was split on commas with its first bracket removed, then joined back into a string without the spaces.\n\n**Fix:** only `allowed_roles` is read as a list now. Every other field, titles included, comes through exactly as written. I c"
       }
     ],
-    "ISSUE-004": []
+    "ISSUE-004": [
+      {
+        "attempt": 1,
+        "turns": 2,
+        "cost_usd": 0.11095940000000001,
+        "files_changed": [],
+        "diff_stat": "",
+        "check": {},
+        "failing_step": null,
+        "failing_detail": [],
+        "fingerprint": null,
+        "outcome": "no-diff",
+        "worker_message": "I haven't changed anything. The issue needs a decision it doesn't make, and the instructions for this attempt say to stop in that case.\n\n**What's wrong:** when a set has no answerable questions, `src/run-retrieval-check.ts` still prints recall@k and precision@k at line 40 and after, as if it had measured something, and exits 0. That happens when the set file is empty or every question is marked unanswerable. The bug itself is real.\n\n**Why I stopped:** the issue offers two fixes that conflict, an"
+      }
+    ]
   }
 }

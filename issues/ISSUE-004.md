@@ -1,6 +1,6 @@
 ---
 id: ISSUE-004
-status: in-progress
+status: needs-human
 auto-fix: true
 ---
 # Retrieval check reports recall 0.000 and passes on a set with no answerable questions
