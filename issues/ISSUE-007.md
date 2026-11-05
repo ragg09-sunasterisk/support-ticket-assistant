@@ -1,6 +1,6 @@
 ---
 id: ISSUE-007
-status: in-progress
+status: needs-human
 auto-fix: true
 ---
 # The retrieval set needs more unanswerable questions

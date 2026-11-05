@@ -7,13 +7,13 @@
     "ISSUE-006"
   ],
   "next": [
-    "ISSUE-007",
     "ISSUE-008",
     "ISSUE-009",
     "ISSUE-010"
   ],
   "needs_human": [
-    "ISSUE-004"
+    "ISSUE-004",
+    "ISSUE-007"
   ],
   "attempts": {
     "ISSUE-001": 2,
@@ -196,6 +196,20 @@
         "worker_message": "`npm run triage`, `npm run golden` and `npm run eval` now refuse to start when `ANTHROPIC_API_KEY` is set. They print the same message and exit with code 1, like the other paid scripts. `npm run check` passes (typecheck, lint, all 31 test files, secret scan).\n\n**The fix:** each of the three scripts now has the same check the other paid scripts use, placed right after argument parsing and before anything that could call Claude:\n- `src/triage-one-ticket.ts`\n- `src/run-golden-set.ts`\n- `src/run-eva"
       }
     ],
-    "ISSUE-007": []
+    "ISSUE-007": [
+      {
+        "attempt": 1,
+        "turns": 4,
+        "cost_usd": 0.162768,
+        "files_changed": [],
+        "diff_stat": "",
+        "check": {},
+        "failing_step": null,
+        "failing_detail": [],
+        "fingerprint": null,
+        "outcome": "no-diff",
+        "worker_message": "I made no changes. The fix the issue asks for can't pass `npm run check` without editing `test/acceptance/`, which I'm not allowed to touch.\n\n**The conflict:** `test/acceptance/handbook-search.acceptance.test.ts:43-47` requires the retrieval set to have exactly 30 questions, 27 of them answerable:\n\n```ts\nit(\"has 30 questions: 27 answerable (3 of them restricted) and 3 unanswerable\", () => {\n  expect(questions).toHaveLength(30);\n  expect(questions.filter((q) => q.answerable)).toHaveLength(27);\n``"
+      }
+    ]
   }
 }
