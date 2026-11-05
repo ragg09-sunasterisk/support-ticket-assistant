@@ -1,6 +1,6 @@
 ---
 id: ISSUE-008
-status: in-progress
+status: needs-human
 auto-fix: true
 ---
 # A heading without Latin letters gets an empty chunk ID

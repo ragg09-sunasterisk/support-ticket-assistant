@@ -11,7 +11,8 @@
     "ISSUE-006",
     "ISSUE-002",
     "ISSUE-003",
-    "ISSUE-005"
+    "ISSUE-005",
+    "ISSUE-008"
   ],
   "attempts": {
     "ISSUE-001": 2,
@@ -33,7 +34,7 @@
     "ISSUE-005": "90e8ad0de2873b9520222dc8f527b0610f16ac474efb9ddb083ee9ad4e04f9c8",
     "ISSUE-006": null,
     "ISSUE-007": null,
-    "ISSUE-008": null,
+    "ISSUE-008": "90e8ad0de2873b9520222dc8f527b0610f16ac474efb9ddb083ee9ad4e04f9c8",
     "ISSUE-009": null,
     "ISSUE-010": null
   },
@@ -187,7 +188,30 @@
         "worker_message": "I made no changes. The fix the issue asks for can't pass `npm run check` without editing `test/acceptance/`, which I'm not allowed to touch.\n\n**The conflict:** `test/acceptance/handbook-search.acceptance.test.ts:43-47` requires the retrieval set to have exactly 30 questions, 27 of them answerable:\n\n```ts\nit(\"has 30 questions: 27 answerable (3 of them restricted) and 3 unanswerable\", () => {\n  expect(questions).toHaveLength(30);\n  expect(questions.filter((q) => q.answerable)).toHaveLength(27);\n``"
       }
     ],
-    "ISSUE-008": [],
+    "ISSUE-008": [
+      {
+        "attempt": 1,
+        "turns": 1,
+        "cost_usd": 0,
+        "files_changed": [
+          "src/retrieval-metrics.ts"
+        ],
+        "diff_stat": "1 file changed, 1 insertion(+), 1 deletion(-)",
+        "check": {
+          "typecheck": 0,
+          "lint": 0,
+          "test": 1,
+          "check:secrets": 0
+        },
+        "failing_step": "test",
+        "failing_detail": [
+          "retrievalMetrics averages per-question recall and precision over answerable questions only"
+        ],
+        "fingerprint": "90e8ad0de2873b9520222dc8f527b0610f16ac474efb9ddb083ee9ad4e04f9c8",
+        "outcome": "max-attempts",
+        "worker_message": "stand-in: changed src/retrieval-metrics.ts"
+      }
+    ],
     "ISSUE-009": [
       {
         "attempt": 1,
