@@ -27,6 +27,8 @@ export interface AgentRunOptions {
   /** Start the session as this subagent (`--agent`): the main thread gets its tools line and prompt. */
   agent?: string;
   env?: NodeJS.ProcessEnv;
+  /** Part 9: `--max-budget-usd` for one call (the loop's worker uses 1.00). */
+  maxBudgetUsd?: number;
 }
 
 /**
@@ -34,7 +36,7 @@ export interface AgentRunOptions {
  * (~/.claude/CLAUDE.md, ~/.claude/rules) and auto memory are excluded, so they can't stand in for a guide.
  */
 export function agentRunArgs(prompt: string, options: AgentRunOptions = {}): string[] {
-  const { maxTurns = AGENT_MAX_TURNS, allowedTools = true, permissionMode = "acceptEdits", settings = {}, agent } = options;
+  const { maxTurns = AGENT_MAX_TURNS, allowedTools = true, permissionMode = "acceptEdits", settings = {}, agent, maxBudgetUsd } = options;
   const userClaudeDir = `${homedir().replaceAll("\\", "/")}/.claude/**`;
   return [
     "-p", prompt,
@@ -46,6 +48,7 @@ export function agentRunArgs(prompt: string, options: AgentRunOptions = {}): str
     ...(allowedTools ? ["--allowedTools", ...ALLOWED_TOOLS] : []),
     ...(agent ? ["--agent", agent] : []),
     "--max-turns", String(maxTurns),
+    ...(maxBudgetUsd === undefined ? [] : ["--max-budget-usd", maxBudgetUsd.toFixed(2)]),
     "--model", AGENT_MODEL,
     "--no-session-persistence",
   ];
@@ -61,6 +64,8 @@ export interface HookEvent {
 export interface AgentRunSummary {
   answer: string;
   subtype: string; // "success", "error_max_turns", … or "no result"
+  /** The result line's `is_error` (Part 9); null when there is no result line. */
+  isError: boolean | null;
   turns: number | null;
   costUsd: number | null;
   sessionId: string | null;
@@ -88,6 +93,7 @@ interface StreamLine {
   stderr?: string;
   message?: { content?: ContentBlock[] | string };
   result?: string;
+  is_error?: boolean;
   num_turns?: number;
   total_cost_usd?: number;
   permission_denials?: { tool_name?: string; tool_input?: unknown }[];
@@ -99,7 +105,7 @@ const blockText = (content: unknown): string =>
 
 export function summarizeAgentStream(stdout: string): AgentRunSummary {
   const summary: AgentRunSummary = {
-    answer: "", subtype: "no result", turns: null, costUsd: null, sessionId: null, tools: [],
+    answer: "", subtype: "no result", isError: null, turns: null, costUsd: null, sessionId: null, tools: [],
     toolCalls: [], hookEvents: [], permissionDenials: [], toolErrors: [],
   };
   for (const line of stdout.split("\n")) {
@@ -131,6 +137,7 @@ export function summarizeAgentStream(stdout: string): AgentRunSummary {
     if (event.type === "result") {
       summary.answer = event.result ?? "";
       summary.subtype = event.subtype ?? "unknown";
+      summary.isError = event.is_error ?? false;
       summary.turns = event.num_turns ?? null;
       summary.costUsd = event.total_cost_usd ?? null;
       summary.permissionDenials = (event.permission_denials ?? []).map((d) => ({ tool: String(d.tool_name), input: d.tool_input }));

@@ -303,6 +303,47 @@ Each round is one line in `logs/part-08-reply-loop.jsonl` (draft, evaluation, fe
 duration; the stop reason on the last round). A round costs about two short calls. The step-by-step
 notes are in `logs/part-08-step-log.md`.
 
+### 15. Part 9: the bounded issue-fixing loop
+
+`npm run fix-issues` builds the loop designed in `docs/loop-design.md`. It works through local issues in
+`issues/ISSUE-NNN.md` (front matter `id`, `status`, `auto-fix`), one `claude -p` worker per iteration in a
+fresh throwaway worktree on branch `fix/<ID>`. Code, not a model, judges each attempt: something changed,
+no protected path (`data/`, `test/acceptance/`, `.claude/`, `.mcp.json`, `.env*`), and `npm run check`'s four
+steps run one by one. Green → one commit on `fix/<ID>`, status `ready-for-review`. Otherwise it retries with
+the verifier's evidence or escalates with `issues/escalations/<ID>.md` (what was tried, the evidence, the
+decision needed). It stops on: green, 3 attempts / 10 iterations, no diff, the same failure twice, the
+30-turn limit, $5 per run ($1 per call), toggle off, empty queue, a protected path, or a worker error.
+State is in `issues/progress.json`, one log line per iteration in `logs/part-09-fix-issues.jsonl`.
+**The loop never pushes, merges or opens a pull request.**
+
+```bash
+# 1. Seed and label: write issues/ISSUE-NNN.md; set `auto-fix: true` on 2-3 easy ones first (rollout).
+# 2. Turn it on and run:
+echo '{ "enabled": true }' > issues/auto-fix.json
+npm run fix-issues
+npm run fix-issues -- --max-iterations 2 --max-run-cost 1   # flags may only lower the limits
+# 3. Read fix/<ID>, then approve and merge it yourself (local merge, no PR, no push):
+git diff HEAD...fix/ISSUE-001
+npm run fix-issues:approve -- --issue ISSUE-001 --approved-by "<your name>"
+# 4. Kill switch: the loop reads the toggle before every iteration.
+echo '{ "enabled": false }' > issues/auto-fix.json           # the next iteration stops: toggle-off
+# 5. Rollback drill: a scripted bad commit, npm run check red, toggle off, git revert, green again.
+npm run fix-issues:drill
+# 6. One-shot claude -p vs the loop on all 10 issues, scored by hidden checks (seat money).
+npm run loop-compare -- --base <commit before Part 9>
+npm run loop-compare -- --base <commit> --checks-only        # no Claude: each hidden check on the base
+```
+
+The drill by hand: commit a change that breaks a test, run `npm run check` (red), set
+`issues/auto-fix.json` to `{ "enabled": false }`, `git revert --no-edit <bad commit>`, run `npm run check`
+(green). To undo an approved fix: `git revert -m 1 <merge commit>` with the toggle off.
+
+Run `fix-issues` and `loop-compare` as plain commands, not piped (`| tee`): in a Claude Code session the
+sandbox exclusion matches the bare command only, and a sandboxed run can't write `.git/config` or reach
+the network. `loop-compare` scores both arms with `scripts/issue-checks/<ID>.mjs`. Workers never see that
+folder (their worktrees leave it out) and the scorer flags any transcript that mentions it. The result
+table is `evals/loop-vs-one-shot.md`. The step-by-step notes are in `logs/part-09-step-log.md`.
+
 ## Seat-only rules
 
 - **Never set `ANTHROPIC_API_KEY`.** If it is set, Claude Code uses that key instead of your seat.
@@ -340,6 +381,10 @@ notes are in `logs/part-08-step-log.md`.
 | `npm run telemetry:up` / `telemetry:down` | Part 7: starts / stops the OpenTelemetry Collector, Prometheus and Grafana in Docker |
 | `npm run telemetry:query` | Part 7: prints tokens by type and estimated cost per Claude Code session from Prometheus |
 | `npm run reply-loop -- --ticket <TCK-id>` | Part 8: drafts a reply with `claude -p`, has a second `claude -p` judge it, and repeats with the feedback until PASS, FAIL or 4 rounds; logs each round |
+| `npm run fix-issues` | Part 9: the bounded issue-fixing loop over `issues/` labelled `auto-fix: true`; one `claude -p` worker per iteration, green fixes on `fix/<ID>`, escalations in `issues/escalations/` |
+| `npm run fix-issues:approve -- --issue <ID> --approved-by "<name>"` | Part 9: the human step: merges a green `fix/<ID>` locally (no PR, no push) and closes the issue |
+| `npm run fix-issues:drill` | Part 9: rollback drill: a scripted bad commit, check red, toggle off, `git revert`, check green |
+| `npm run loop-compare -- --base <commit>` | Part 9: one-shot `claude -p` vs the loop on the 10 issues, scored by hidden checks; writes `evals/loop-vs-one-shot.md` (`--checks-only` needs no Claude) |
 
 ## Secret guard
 

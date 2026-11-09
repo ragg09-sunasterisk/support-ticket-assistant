@@ -47,6 +47,8 @@
       "Bash(npm run reviewer-proof*)",
       "Bash(npm run security-compare*)",
       "Bash(npm run reply-loop*)",
+      "Bash(npm run fix-issues*)",
+      "Bash(npm run loop-compare*)",
       "Bash(npm run telemetry:*)",
       "Bash(docker compose *)"
     ],
@@ -88,7 +90,9 @@
       "npm run rule-tests*",
       "npm run reviewer-proof*",
       "npm run security-compare*",
-      "npm run reply-loop*"
+      "npm run reply-loop*",
+      "npm run fix-issues*",
+      "npm run loop-compare*"
     ],
     "filesystem": {
       "denyRead": ["./.env", "./.env.local", "./.env.development", "./.env.production", "./.env.test"]

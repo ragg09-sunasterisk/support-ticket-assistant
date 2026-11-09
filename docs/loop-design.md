@@ -1,8 +1,9 @@
 # Loop design: the issue-fixing loop (`npm run fix-issues`)
 
-Design for the loop that Part 9 builds. Nothing here exists yet: no `issues/` folder, no controller code.
-The headings are lesson 8.2's eight parts. Every stop rule has a condition a script can check without
-asking a model.
+Design for the loop that Part 9 builds (`src/fix-issues-*.ts`, `src/run-fix-issues.ts`, `issues/`). The
+headings are lesson 8.2's eight parts. Every stop rule has a condition a script can check without asking
+a model. Part 9 changed the design in a few places while building it; each change is marked
+**(Part 9)** and explained in `logs/part-09-step-log.md`.
 
 ## 1. Goal
 
@@ -13,7 +14,9 @@ a change a person hasn't approved.
   and no protected path changed. Its status becomes `ready-for-review`. A person reviews, opens the pull
   request and merges. **The loop never opens a PR, merges or pushes.**
 - **Success for one run:** every issue it picked up ends as `ready-for-review` or `needs-human` with an
-  escalation summary. Nothing is left half-done without a record.
+  escalation summary, or **(Part 9)** stays `in-progress` with its attempts in `progress.json` and its id
+  in the run's stop line (`left_in_progress`) when a run stop (budget, iteration cap) cut it off; the next
+  run resumes it. Nothing is left half-done without a record.
 - **Out of scope:** issues without the `auto-fix: true` label, anything under `data/`,
   `test/acceptance/`, `.claude/`, `.mcp.json`, `.env*`, and adding dependencies.
 
@@ -33,7 +36,8 @@ auto-fix: true          # the label; missing or false = people only
 
 An issue is **picked** when `auto-fix == true` and either `status == "open"`, or `status ==
 "in-progress"` with `progress.attempts[id] < MAX_ATTEMPTS_PER_ISSUE` (a retry, or a run that was cut off
-and resumed). Lowest `id` first. Part 9 seeds 10 issues.
+and resumed). Lowest `id` first. Part 9 seeds 10 issues. **(Part 9)** Picking an `open` issue is a fresh
+start: its attempts, fingerprint and feedback are reset, so a person can reopen an escalated issue.
 
 **The toggle.** `issues/auto-fix.json` holds `{ "enabled": true }`. The controller reads it **before every
 iteration**, not once per run. Missing file, bad JSON or `enabled !== true` means off: stop, touch
@@ -52,7 +56,8 @@ The loop must be able to stop at any point and resume from files, not from memor
 | File | Committed? | Holds |
 |---|---|---|
 | `issues/<ISSUE-ID>.md` | yes | the issue; the controller updates only its `status` |
-| `issues/progress.json` | yes | `done`, `next`, `needs_human` (lists of IDs), plus per ID `attempts` and `last_fingerprint` (rule 4 survives a restart) |
+| `issues/progress.json` | yes | `done`, `next`, `needs_human` (lists of IDs), plus per ID `attempts` and `last_fingerprint` (rule 4 survives a restart); **(Part 9)** also per ID `feedback` (the verifier evidence the next attempt gets) and `history` (one summary per attempt, for the escalation) |
+| `logs/part-09-rollout.jsonl` | yes | **(Part 9)** the person's side: approvals and merges, the rollback drill |
 | `issues/escalations/<ISSUE-ID>.md` | yes | the escalation summary (section 8) |
 | `logs/part-09-fix-issues.jsonl` | yes | one line per iteration: issue, attempt, branch, turns, cost, check exit code, failure fingerprint, stop rule (if one fired) |
 | git branches `fix/<ISSUE-ID>` | local only | the green change: one commit, made only when rule 1 fires |
@@ -78,7 +83,14 @@ claude -p --output-format stream-json --verbose \
 
 - **Prompt:** the issue text inside `<issue>` tags, marked as untrusted data, plus "fix it so that
   `npm run check` passes; don't change any test in `test/acceptance/`". On a retry it also gets the
-  previous attempt's verifier output (failing tests and errors), not its transcript.
+  previous attempt's verifier output (failing tests and errors), not its transcript. **(Part 9)** It also
+  says: add or update tests in `test/`; if the issue needs a decision it doesn't make, or can only be fixed
+  in a protected path, change nothing and say why (that is what makes rule 3 a real escalation route);
+  don't commit, push or open a PR.
+- **Hidden paths (Part 9):** the worktree leaves out `scripts/issue-checks/` (the scoring checks of
+  `npm run loop-compare`) with skip-worktree bits, so `git status` stays clean. Not `git sparse-checkout`:
+  in a linked worktree it writes `extensions.worktreeConfig` to `.git/config`, which the Claude Code
+  sandbox keeps read-only.
 - **Limits:** the Part 7 project settings apply (deny rules, sandbox, hooks), so `test/acceptance/`,
   `data/`, `.claude/` and `.env*` are blocked by rules and the sandbox, not by the prompt.
   `--max-turns 30` is the per-iteration turn limit.
@@ -101,7 +113,13 @@ fingerprint**, `sha256(step + "\n" + detail)`, where `detail` is:
 - `typecheck`, `lint`: the error lines (`file(line,col): error TS…` / ESLint rule lines) with every digit
   removed, sorted;
 - `test`: the sorted `fullName`s of failed tests from `npx vitest run --reporter=json --outputFile=<tmp>`;
-- `check:secrets`: the file paths it reports, sorted.
+- `check:secrets`: the file paths it reports, sorted;
+- **(Part 9)** `retrieval-check`: its miss/error lines with digits removed, sorted.
+
+**(Part 9)** Paths in the output are made relative to the worktree first (each attempt has its own temp
+folder). The changes are staged in the worktree's own index before the steps run, because
+`check:secrets` scans the index. `.env*` files are git-ignored, so they are found with
+`git ls-files --others --ignored`. After a worker crash (no `result` event) only the git checks run.
 
 Rule 4 compares it with `progress.last_fingerprint[id]`; the controller then stores the new one.
 
@@ -119,7 +137,8 @@ loop:
   fresh worktree on fix/<id>; run worker -> log turns, cost (missing cost counts as $1.00)
   run verifier                         -> log exit codes, fingerprint
   apply the issue rules in this order (first match wins):
-    worker error, protected path, 1 green, 5 turn limit, 3 no diff, 4 repeated failure, 2 max attempts
+    worker error, protected path, 1 green, 5 turn limit, 6 budget (per call), 3 no diff,
+    4 repeated failure, 2 max attempts                                  (Part 9: per-call budget placed)
     green        -> commit on fix/<id>, status ready-for-review, done += id
     needs human  -> write escalation summary, status needs-human, needs_human += id
     otherwise    -> status stays in-progress; picked again next iteration with the verifier output
@@ -153,7 +172,7 @@ still the best signal a script can read.
 
 ## 8. Escalation
 
-Every issue stop that is not rule 1 (and a run stop that leaves an issue `in-progress`) writes
+Every issue stop that is not rule 1 writes
 `issues/escalations/<ISSUE-ID>.md`, sets the issue to `needs-human` and adds it to
 `progress.json.needs_human`:
 
