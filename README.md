@@ -21,42 +21,32 @@ trust the folder and to approve the `handbook` MCP server; say yes. Check it wit
 
 | Tool | Version | Check with |
 |---|---|---|
+| macOS, Linux, or Windows with WSL2 | on Windows, run everything inside WSL2 | `echo $WSL_DISTRO_NAME` (WSL only) |
 | Node.js | 24 or newer | `node --version` |
 | Git | any recent version | `git --version` |
-| Claude Code | 2.1.310 | `claude --version` |
+| Claude Code | a recent build | `claude --version` |
 | Claude Team seat | Sun-asterisk PH | `claude auth status --text` |
 
 The course was built and tested on Claude Code 2.1.310. Newer builds may differ slightly.
 
 ## Setup
 
-### 1. Install Claude Code 2.1.310
+The course's **Start here** Doc (in Google Classroom, Start here topic) has the full setup with checks
+and hints. Steps 1–4 below are the short version.
 
-macOS, Linux or WSL:
+### 1. Set up your machine
+
+Follow Start here steps 1–4: WSL2 on Windows, Git connected to GitHub, Node 24 with nvm, and
+Claude Code. On macOS, Linux and WSL, Claude Code installs with:
 
 ```bash
-curl -fsSL https://claude.ai/install.sh | bash -s 2.1.310
+curl -fsSL https://claude.ai/install.sh | bash
 ```
-
-Windows PowerShell:
-
-```powershell
-& ([scriptblock]::Create((irm https://claude.ai/install.ps1))) 2.1.310
-```
-
-Already have Claude Code? Switch to the course build with `claude install 2.1.310`.
-
-Check it: `claude --version` should print `2.1.310 (Claude Code)`.
 
 ### 2. Sign in with your Team seat
 
 ```bash
 claude auth login --claudeai
-```
-
-A browser opens. Sign in with your Sun-asterisk email. Then check:
-
-```bash
 claude auth status --text
 ```
 
@@ -71,14 +61,24 @@ claude doctor
 
 Fix anything it reports before you go on.
 
-### 4. Get the code
+### 4. Get your own copy of the project
+
+You work in your own public GitHub repo. This repo's `part-NN-start` branches are checkpoints you
+start from and compare against. Create an empty repo on your personal GitHub account (no README),
+then copy your starter branch into it. Replace `NN` with your start part (`01`, `04`, `06` or `08`)
+and `<your repo URL>` with your new repo's URL:
 
 ```bash
-git clone https://github.com/ragg09-sunasterisk/support-ticket-assistant.git
-cd support-ticket-assistant
+git clone --branch part-NN-start https://github.com/ragg09-sunasterisk/support-ticket-assistant.git my-ticket-assistant
+cd my-ticket-assistant
+git branch -m main
+git remote rename origin course
+git remote add origin <your repo URL>
+git push -u origin main
 ```
 
-Starting at a later part? Switch to your starter branch, for example `git switch part-04-start`.
+Your work goes to `origin`. The course branches stay readable as `course/part-NN-start`.
+Never commit client or company data: the project uses made-up tickets only.
 
 ### 5. Install
 
